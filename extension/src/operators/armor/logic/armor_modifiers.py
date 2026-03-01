@@ -99,7 +99,7 @@ class ArmorModifierSetup:
                 utils.add_modifier_lattice_smart_deform(self.rig, armor_object)
                 utils.add_modifier_lattice_head(self.rig, armor_object)
             if solidify:
-                utils.add_modifier_solidify(armor_object, -0.045)
+                utils.add_modifier_solidify(armor_object, -0.09)
 
             bpy.context.view_layer.objects.active = armor_object
 
@@ -112,7 +112,7 @@ class ArmorModifierSetup:
         utils.add_modifier_subdivision(armor_object, 0, 3, 'SIMPLE')
         last_index = len(armor_object.modifiers) - 1
         if solidify:
-            bpy.ops.object.modifier_move_to_index(modifier="Solidify", index=last_index)
+            bpy.ops.object.modifier_move_to_index(modifier="Solidify", index=0)
         bpy.ops.object.modifier_move_to_index(
             modifier="Auto Smooth",
             index=last_index
