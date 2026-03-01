@@ -3,6 +3,10 @@
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BlueEvilGFX/thomas-rig-legacy)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
 
+<p align="center">
+  <img src="./assets/thumbnail.webp" width="50%">
+</p>
+
 Elevate your Minecraft animations with this versatile and user-friendly Minecraft Player Rig for Blender! Perfect for both novice and experienced animators, this rig is packed with features to enhance your creative projects:
 
 - **Custom UI**: custom UI to simplify animating and creating presets
