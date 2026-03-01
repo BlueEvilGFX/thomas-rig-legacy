@@ -59,6 +59,10 @@ class OBJECT_MT_APPEND(bpy.types.Operator):
             cursor_position = bpy.context.scene.cursor.location
             rig.pose.bones['Root'].matrix.translation = cursor_position
             rig.pose.bones['Root'].scale = (1, 1, 1)
+
+        # set default size
+        default_size = preferences.default_player_rig_scale # False: Minecraft, True: Original -> show constraint
+        rig.pose.bones["Root"].constraints["pre-scale"].enabled = default_size
         return{'FINISHED'}
 
 

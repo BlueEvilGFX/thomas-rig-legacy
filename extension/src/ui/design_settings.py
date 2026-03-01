@@ -5,10 +5,16 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
     from .. import icons
 
     # Pose / Rest Pose
+    box = layout.box().column()
+    row = box.row(align=True)
     preferences = context.preferences.addons[constants.PACKAGE].preferences 
     if preferences.show_pose_mode:
-        row = layout.box().row(align=True)
         row.prop(rig.data, "pose_position", expand=True)
+    
+    row = box.row(align=True)
+    row.prop(rig.pose.bones["Root"].constraints["pre-scale"], "enabled", text="MC Scale", emboss=True, icon="CHECKBOX_DEHLT")
+    row.prop(rig.pose.bones["Root"].constraints["pre-scale"], "enabled", text="Original Scale", invert_checkbox=True, icon="CHECKBOX_DEHLT")
+ 
 
 
     box = layout.box()

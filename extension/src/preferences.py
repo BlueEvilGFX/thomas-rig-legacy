@@ -17,6 +17,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
     # -------------------- SETTINGS --------------------
     second_layer_alternative_placement : BoolProperty(default=False) #type: ignore
     show_pose_mode: BoolProperty(default=True) #type: ignore
+    default_player_rig_scale: BoolProperty(default=False) #type: ignore
 
     def draw(self, context):
         pcoll = icons.thomas_icons["thomas_legacy"]
@@ -33,6 +34,26 @@ class AddonPreferences(bpy.types.AddonPreferences):
             "show_pose_mode",
             text="toggle Pose / Rest Pose setting in the UI"
         )
+
+        row = settings_col.row(align=True)
+        split = row.split(factor=0.5)
+        left = split.row(align=True)
+        
+        left.prop(
+            self,
+            "default_player_rig_scale",
+            text="Minecraft Scale",
+            toggle = True
+        )
+        left.prop(
+            self,
+            "default_player_rig_scale",
+            text="Original Scale",
+            toggle = True,
+            invert_checkbox=True
+        )
+        right = split
+        right.label(text="Toggles the default player rig scale")
 
         col = layout.box().column()
         if not self.mc_textures_loaded:
