@@ -1,11 +1,27 @@
-# Thomas Rig Legacy - an advanced player rig for Blender
-![Status](https://img.shields.io/badge/status-stable-brightgreen)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/BlueEvilGFX/thomas-rig-legacy)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
+# Thomas Rig Legacy — an advanced character rig in a Minecraft‑style aesthetic
 
 <p align="center">
-  <img src="./assets/thumbnail.webp" width="50%">
+  <img src="https://img.shields.io/badge/status-stable-brightgreen">
+  <img src="https://img.shields.io/github/v/release/BlueEvilGFX/thomas-rig-legacy">
+  <a href="https://www.gnu.org/licenses/gpl-3.0">
+    <img src="https://img.shields.io/badge/License-GPLv3-blue.svg">
+  </a>
+  <img src="https://img.shields.io/badge/Blender-Extension-orange?logo=blender&logoColor=white">
 </p>
+
+<p align="center">
+  <img src="./assets/thumbnail.webp" width="60%" style="border-radius: 8px;">
+  <br>
+  <em>A versatile, animator‑friendly character rig designed in a block‑based, Minecraft‑style look.</em>
+</p>
+
+<p align="center" style="margin-top: 16px; margin-bottom: 24px;">
+  <a href="https://extensions.blender.org/add-ons/thomas-rig-legacy/">
+    <img src="https://img.shields.io/badge/Get%20it%20on-Blender%20Extensions-F5792A?logo=blender&logoColor=white&style=for-the-badge" height="50">
+  </a>
+</p>
+
+---
 
 Elevate your Minecraft animations with this versatile and user-friendly Minecraft Player Rig for Blender! Perfect for both novice and experienced animators, this rig is packed with features to enhance your creative projects:
 
