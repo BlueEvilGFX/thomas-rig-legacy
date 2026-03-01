@@ -1,22 +1,17 @@
-import bpy
+from .src import preferences, icons, properties, operators, append_ui, ui
 
-from .src import preferences
-from .src import icons
-from .src import properties
-from .src import operators
-from .src import append_ui
-from .src import ui
+def register():
+    preferences.register()
+    icons.register()
+    properties.register()
+    operators.register()
+    append_ui.register()
+    ui.register()
 
-modules = (
-    "preferences",
-    "icons",
-    "properties",
-    "operators",
-    "append_ui",
-    "ui",
-)
-
-register, unregister = bpy.utils.register_submodule_factory(
-    module_name =  __name__,
-    submodule_names = modules
-)
+def unregister():
+    ui.unregister()
+    append_ui.unregister()
+    operators.unregister()
+    properties.unregister()
+    icons.unregister()
+    preferences.unregister()

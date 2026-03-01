@@ -3,8 +3,8 @@ import bpy
 from .. import utils
 from .. import constants
 
-MAX_VERSION = (1, 1, 9)
-MIN_VERSION =  (1, 1, 4)
+MAX_VERSION = (1, 2, 0)
+MIN_VERSION =  (1, 2, 0)
 
 class THOMAS_RIG_UPDATE_RIG(bpy.types.Operator):
     bl_idname = "thomasriglegacy.update_rig"
@@ -45,20 +45,10 @@ class THOMAS_RIG_UPDATE_RIG(bpy.types.Operator):
         rig_version = rig.get("rig_version", None)
         ext_version = utils.get_ext_version()
 
-        if tuple(rig_version) < (1, 1, 5):
-            Updater.update_to_1_1_5(self)
+        # example of use
 
-        if tuple(rig_version) < (1, 1, 6):
-            Updater.update_to_1_1_6(self)
-
-        if tuple(rig_version) < (1, 1, 7):
-            Updater.update_to_1_1_7(self)
-
-        if tuple(rig_version) < (1, 1, 8):
-            Updater.update_to_1_1_8(self)
-
-        if tuple(rig_version) < (1, 1, 9):
-            Updater.update_to_1_1_9(self)
+        #if tuple(rig_version) < (1, 1, 9):
+        #    Updater.update_to_1_1_9(self)
 
         # set rig version to newest
         rig["rig_version"] = ext_version
@@ -69,28 +59,21 @@ class THOMAS_RIG_UPDATE_RIG(bpy.types.Operator):
     
 
 class Updater():
-    def update_to_1_1_5(self):
-        pass
+    pass
 
-    def update_to_1_1_6(self):
-        pass
+    # this is one example how to use this class
 
-    def update_to_1_1_7(self):
-        pass
 
-    def update_to_1_1_8(self):
-        pass
-
-    def update_to_1_1_9(self):
-        # reset location & deactivate "Transformation" displace constraint 
-        rig = utils.get_rig()
-        rig.location = (0, 0, 0)
-        rig.pose.bones["Root"].constraints["Transformation"].enabled = False
-
-        # move subdiv modifier under armature
-        for obj in rig.children_recursive:
-            if "Head_Boolean_Eyes" not in obj.name:
-                continue
-            mod = obj.modifiers["Armature"]
-            idx = list(obj.modifiers).index(mod)
-            obj.modifiers.move(idx, 0)
+    # def update_to_1_1_9(self):
+    #     # reset location & deactivate "Transformation" displace constraint 
+    #     rig = utils.get_rig()
+    #     rig.location = (0, 0, 0)
+    #     rig.pose.bones["Root"].constraints["Transformation"].enabled = False
+    # 
+    #     # move subdiv modifier under armature
+    #     for obj in rig.children_recursive:
+    #         if "Head_Boolean_Eyes" not in obj.name:
+    #             continue
+    #         mod = obj.modifiers["Armature"]
+    #         idx = list(obj.modifiers).index(mod)
+    #         obj.modifiers.move(idx, 0)

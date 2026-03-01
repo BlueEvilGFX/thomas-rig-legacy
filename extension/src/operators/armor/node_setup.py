@@ -2,7 +2,7 @@ import bpy
 import os
 import random
 
-from .armor_enums import TrimEnum, MaterialEnum, ArmorPartEnum, ShaderNodeEnum
+from .logic.armor_enums import TrimEnum, MaterialEnum, ArmorPartEnum, ShaderNodeEnum
 from ... import constants
 
 ENCHANTMENT_VALUE: float = 3.8
@@ -18,13 +18,18 @@ class ShaderNodeHandler:
     trim_colour: tuple[float, float, float]
     leather_colour: tuple[float, float, float]
     enchantment: bool
+    trim_emission: bool
 
     material: bpy.types.Material
     node_tree: bpy.types.NodeTree
     nodes: list[bpy.types.Node]
     node_links: list[bpy.types.NodeLinks]
 
-    def __init__(
+    filepath: str # optional
+
+    loaded_textures = {} # texturepath : image
+
+    def initialize(
             self,
             armor_obj: bpy.types.Object,
             original_textures: bool,
@@ -33,7 +38,9 @@ class ShaderNodeHandler:
             armor_trim: TrimEnum,
             trim_colour: tuple[float, float, float],
             leather_colour: tuple[float, float, float],
-            enchantment: bool
+            enchantment: bool,
+            trim_emission: bool,
+            filepath: str = None
     ):
         self.armor_obj = armor_obj
         self.original_textures = original_textures
@@ -43,6 +50,7 @@ class ShaderNodeHandler:
         self.trim_colour = trim_colour
         self.leather_colour = leather_colour
         self.enchantment = enchantment
+        self.trim_emission = trim_emission
 
         self.material = armor_obj.data.materials[0]
         self.node_tree = self.material.node_tree
@@ -54,8 +62,10 @@ class ShaderNodeHandler:
 
         self.armor_texture_dir = self._get_extension_armor_dir() \
             if self.original_textures else constants.ARMOR_PATH_VANILLA
+        
+        self.filepath = filepath
 
-    def initialize(self):
+    def execute(self):
         """takes care of all needed node changes"""
         self._clear_nodes()
         self._set_base_nodes()
@@ -65,6 +75,9 @@ class ShaderNodeHandler:
 
         if self.armor_trim != TrimEnum.NONE:
             self._handle_trim()
+
+            if self.trim_emission:
+                self._handle_trim_emission()
         
         if self.enchantment:    
             self._handle_enchantment()
@@ -111,9 +124,19 @@ class ShaderNodeHandler:
         self._create_link(bsdf_node, 0, output_node, 0)
 
         # Set texture
-        material = self.armor_material.value
-        texture = os.path.join(self.armor_texture_dir,  f"{material}_{self.layer}.png")
-        image = bpy.data.images.load(texture)
+        # use custom texture if filepath is given
+        if self.filepath:
+            texture =  self.filepath
+        else:
+            material = self.armor_material.value
+            texture = os.path.join(self.armor_texture_dir,  f"{material}_{self.layer}.png")
+
+        if not texture in self.loaded_textures.keys():
+            image = bpy.data.images.load(texture)
+            self.loaded_textures[texture] = image
+        else:
+            image = self.loaded_textures[texture]
+
         image_node.image = image
 
     def _handle_leather(self):
@@ -172,7 +195,13 @@ class ShaderNodeHandler:
         # Load overlay texture
         material = self.armor_material.value
         texture = os.path.join(self.armor_texture_dir,  f"{material}_overlay_{self.layer}.png")
-        image = bpy.data.images.load(texture)
+
+        if not texture in self.loaded_textures.keys():
+            image = bpy.data.images.load(texture)
+            self.loaded_textures[texture] = image
+        else:
+            image = self.loaded_textures[texture]
+        
         leather_overlay_node.image = image
 
         # repostion and connect
@@ -259,11 +288,94 @@ class ShaderNodeHandler:
         # Load trim texture
         texture = os.path.join(
             self._get_extension_trims_dir(),
-            f"{self.armor_trim.value}.png"
+            f"{self.armor_trim.value}_layer_2.png" \
+                if self.armor_part in {ArmorPartEnum.LEGGINGS}
+                else f"{self.armor_trim.value}.png"
         )
         
-        image = bpy.data.images.load(texture)
+
+        if not texture in self.loaded_textures.keys():
+            image = bpy.data.images.load(texture)
+            self.loaded_textures[texture] = image
+        else:
+            image = self.loaded_textures[texture]
+
         trim_node.image = image 
+
+    def _handle_trim_emission(self):
+        # Add nodes
+        base_location = self._get_node(ShaderNodeEnum.BSDF).location
+
+        # emission shader
+        shader_emission = self.nodes.new("ShaderNodeEmission")
+        self._set_naming(shader_emission, ShaderNodeEnum.TRIM_EMISSION_SHADER)
+        offset = (0 , -350)
+        new_location = tuple(x + y for x, y in zip(base_location, offset))
+        shader_emission.location = new_location
+
+        # emission value
+        emission_value_node = self.nodes.new("ShaderNodeValue")
+        self._set_naming(emission_value_node, ShaderNodeEnum.TRIM_EMISSION_VALUE)
+        emission_value_node.outputs[0].default_value = constants.DEFAULT_EMISSION_VALUE
+        offset = (-400 , -650)
+        new_location = tuple(x + y for x, y in zip(base_location, offset))
+        emission_value_node.location = new_location
+
+        # mix shader
+        shader_mix = self.nodes.new("ShaderNodeMixShader")
+        self._set_naming(shader_mix, ShaderNodeEnum.TRIM_MIX_SHADER)
+        offset = (350 , 0)
+        new_location = tuple(x + y for x, y in zip(base_location, offset))
+        shader_mix.location = new_location
+
+        # light path | camera ray
+        ligh_path = self.nodes.new("ShaderNodeLightPath")
+        self._set_naming(ligh_path, ShaderNodeEnum.TRIM_EMISSION_CAMERA_RAY)
+        ligh_path.hide = True
+        offset = (-400 , -550)
+        new_location = tuple(x + y for x, y in zip(base_location, offset))
+        ligh_path.location = new_location
+
+        # blow out value
+        blow_out_value_node = self.nodes.new("ShaderNodeValue")
+        self._set_naming(blow_out_value_node, ShaderNodeEnum.TRIM_EMISSION_BLOW_OUT)
+        blow_out_value_node.outputs[0].default_value = 0.1
+        offset = (-400 , -700)
+        new_location = tuple(x + y for x, y in zip(base_location, offset))
+        blow_out_value_node.location = new_location
+
+        # blow out math mix
+        blow_out_mix_node = self.nodes.new("ShaderNodeMix")
+        self._set_naming(blow_out_mix_node, ShaderNodeEnum.TRIM_EMISSION_MIX_BLOW_OUT)
+        offset = (-200 , -500)
+        new_location = tuple(x + y for x, y in zip(base_location, offset))
+        blow_out_mix_node.location = new_location
+
+        # blow out colour mix
+        blow_out_mix_colour_node = self.nodes.new("ShaderNodeMixRGB")
+        self._set_naming(blow_out_mix_colour_node, ShaderNodeEnum.TRIM_EMISSION_MIX_Colour_BLOW_OUT)
+        blow_out_mix_colour_node.inputs[2].default_value = [0, 0, 0, 1] # set to black
+        offset = (0 , -500)
+        new_location = tuple(x + y for x, y in zip(base_location, offset))
+        blow_out_mix_colour_node.location = new_location
+
+        # move output node
+        output = self.nodes["output"]
+        output.location[0] = output.location[0] + 200
+
+        # link nodes
+        bsdf_node = self._get_node(ShaderNodeEnum.BSDF)
+        trim_colour_node = self._get_node(ShaderNodeEnum.TRIM_COLOUR)
+
+        self._create_link(trim_colour_node, "Color", shader_emission, "Color")
+        self._create_link(shader_emission, 0, shader_mix, 2)
+        self._create_link(bsdf_node, 0, shader_mix, 1)
+        self._create_link(shader_mix, 0, output, 0)
+        self._create_link(ligh_path, "Is Camera Ray", blow_out_mix_node, 'A')
+        self._create_link(emission_value_node, 0, blow_out_mix_colour_node, 1)
+        self._create_link(blow_out_value_node, 0, blow_out_mix_node, 0)
+        self._create_link(blow_out_mix_node, 0, blow_out_mix_colour_node, 0)
+        self._create_link(blow_out_mix_colour_node, 0, shader_emission, 1)
 
     def _handle_enchantment(self):
         # Move nodes
@@ -391,10 +503,15 @@ class ShaderNodeHandler:
         # Load enchantment texture
         texture = os.path.join(
             self._get_extension_armor_dir(),
-            "enchanted_glint_entity.png"
+            "enchanted_glint_armor.png"
         )
 
-        image = bpy.data.images.load(texture)
+        if not texture in self.loaded_textures.keys():
+            image = bpy.data.images.load(texture)
+            self.loaded_textures[texture] = image
+        else:
+            image = self.loaded_textures[texture]
+            
         enchantment_node.image = image
 
     def _clear_nodes(self):

@@ -38,3 +38,12 @@ SKIN_URL = r"https://sessionserver.mojang.com/session/minecraft/profile/"
 
 # extension version
 EXT_VERSION = None # set and read by addon directly
+
+# Minecraft Version
+MIN_VERSION = [1, 21, 11]
+
+# preferences
+SECOND_LAYER_ALTERNATIVE_HEAD_POSITION_Z = 2.8
+
+# values
+DEFAULT_EMISSION_VALUE = 5

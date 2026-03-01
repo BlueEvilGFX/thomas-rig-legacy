@@ -1,5 +1,5 @@
 from bpy.props import EnumProperty, FloatVectorProperty, BoolProperty
-from .armor_enums import TrimEnum, MaterialEnum, ArmorTypeEnum
+from .logic.armor_enums import TrimEnum, MaterialEnum, ArmorTypeEnum
 from ... import utils
 
 # Custom type alias
