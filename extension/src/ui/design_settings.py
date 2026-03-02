@@ -248,6 +248,7 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
                     "box": box,
                     "context" : context,
                     "rig" : rig,
+                    "user_props" : user_props,
                 }
                 exec(source_string, namespace)
 
