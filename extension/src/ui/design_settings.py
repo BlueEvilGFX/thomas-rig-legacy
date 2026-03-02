@@ -244,6 +244,7 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
             if "PYTHON"in system: # Python
                 # defining namespace to restrict access
                 namespace = {
+                    "layout" : layout,
                     "box": box,
                     "context" : context,
                     "rig" : rig,
