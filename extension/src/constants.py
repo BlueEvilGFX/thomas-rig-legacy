@@ -3,10 +3,13 @@ from pathlib import Path
 
 RIG_ID = 'Thomas_Rig_Legacy'
 
+# Minecraft Version
+MIN_VERSION = [1, 21, 11]
+
 # info
 INFO_TEXT = "To use the original Minecraft textures, you need to have a legal copy of Minecraft installed (min. ver. 1.21, no snapshot). If you do not own one, please proceed with the `skip` operator. The addon will use alternative textures in the meantime. You can still load the original textures later in the addon preferences once you have Minecraft installed."
 INFO_TEXT_PREFERENCES = "To use the original Minecraft textures, you need to have a legal copy of Minecraft installed (min. ver. 1.21, no snapshot). If you do not own one, the addon will use alternative textures."
-INFO_TEXT_PREFERENCES_IMPORT = "To manually import the textures, you need to have either the jar or zip file of the game version that contains the game files. This requires also a min. ver. of 1.21."
+INFO_TEXT_PREFERENCES_IMPORT = f"To manually import the textures, you need to have either the jar or zip file of the game version that contains the game files. This requires also a min. ver. of {str(MIN_VERSION)}."
 
 # main
 PACKAGE = '.'.join(__package__.split('.')[:-1])
@@ -38,9 +41,6 @@ SKIN_URL = r"https://sessionserver.mojang.com/session/minecraft/profile/"
 
 # extension version
 EXT_VERSION = None # set and read by addon directly
-
-# Minecraft Version
-MIN_VERSION = [1, 21, 11]
 
 # preferences
 SECOND_LAYER_ALTERNATIVE_HEAD_POSITION_Z = 2.8
