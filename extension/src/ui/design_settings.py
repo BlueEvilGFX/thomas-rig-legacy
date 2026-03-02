@@ -246,6 +246,7 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
                 namespace = {
                     "box": box,
                     "context" : context,
+                    "rig" : rig,
                 }
                 exec(source_string, namespace)
 
