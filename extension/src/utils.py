@@ -1,5 +1,7 @@
 import bpy
 import addon_utils
+import hashlib
+
 from . import constants
 
 from typing import List, Optional, Tuple
@@ -140,3 +142,6 @@ def get_image_size(filepath: str) -> Optional[Tuple[int, int]]:
             return img.size  # (width, height)
     except Exception:
         return None
+
+def hash_string(text: str) -> str:
+    return hashlib.sha256(text.encode('utf-8')).hexdigest()

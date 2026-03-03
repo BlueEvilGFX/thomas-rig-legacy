@@ -40,4 +40,7 @@ Download now and start animating!
 - *This rig is an advanced edit of the Thomas Rig by Thomas Animation, used with permission.*  
 - *To use the original Minecraft textures, you must have a legal copy of Minecraft installed on your device (min. ver. 1.21.11). While fallback textures are available, they do not cover all textures.*
 - The rig should only be moved in pose mode.
-s
+
+\
+[![Join our Discord](https://img.shields.io/badge/Join_our_Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](
+https://discord.com/invite/3mybvgB6wE)
