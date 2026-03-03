@@ -126,12 +126,12 @@ class ShaderNodeHandler:
         # Set texture
         # use custom texture if filepath is given
         if self.filepath:
-            texture =  self.filepath
+            texture = self.filepath
         else:
             material = self.armor_material.value
             texture = os.path.join(self.armor_texture_dir,  f"{material}_{self.layer}.png")
 
-        if not texture in self.loaded_textures.keys():
+        if (not texture in self.loaded_textures.keys()) or (texture not in [img.filepath for img in bpy.data.images]):
             image = bpy.data.images.load(texture)
             self.loaded_textures[texture] = image
         else:
@@ -196,7 +196,7 @@ class ShaderNodeHandler:
         material = self.armor_material.value
         texture = os.path.join(self.armor_texture_dir,  f"{material}_overlay_{self.layer}.png")
 
-        if not texture in self.loaded_textures.keys():
+        if (not texture in self.loaded_textures.keys()) or (texture not in [img.filepath for img in bpy.data.images]):
             image = bpy.data.images.load(texture)
             self.loaded_textures[texture] = image
         else:
@@ -293,8 +293,7 @@ class ShaderNodeHandler:
                 else f"{self.armor_trim.value}.png"
         )
         
-
-        if not texture in self.loaded_textures.keys():
+        if (not texture in self.loaded_textures.keys()) or (texture not in [img.filepath for img in bpy.data.images]):
             image = bpy.data.images.load(texture)
             self.loaded_textures[texture] = image
         else:
@@ -506,7 +505,7 @@ class ShaderNodeHandler:
             "enchanted_glint_armor.png"
         )
 
-        if not texture in self.loaded_textures.keys():
+        if (not texture in self.loaded_textures.keys()) or (texture not in [img.filepath for img in bpy.data.images]):
             image = bpy.data.images.load(texture)
             self.loaded_textures[texture] = image
         else:
