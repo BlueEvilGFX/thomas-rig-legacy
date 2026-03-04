@@ -204,7 +204,8 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
                     material=None,
                     filepath=filepath
                 )
-
+        
+        # -------------------- FINISH -------------------
         bpy.ops.object.select_all (action='DESELECT')
         if mode and self.parent:
             context.view_layer.objects.active = self.rig

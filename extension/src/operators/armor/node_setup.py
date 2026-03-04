@@ -27,7 +27,8 @@ class ShaderNodeHandler:
 
     filepath: str # optional
 
-    loaded_textures = {} # texturepath : image
+    def __init__(self):
+        self.loaded_textures = {}
 
     def initialize(
             self,
@@ -100,6 +101,15 @@ class ShaderNodeHandler:
             "trims"
         )
 
+    def _set_image(self, node, texture):
+        print(self.loaded_textures)
+        try:
+            node.image = self.loaded_textures[texture]
+        except (ReferenceError, KeyError):
+            image = bpy.data.images.load(texture)
+            self.loaded_textures[texture] = image
+            node.image = image
+
     def _set_base_nodes(self):
         # Add nodes
         image_node = self.nodes.new("ShaderNodeTexImage")
@@ -131,13 +141,7 @@ class ShaderNodeHandler:
             material = self.armor_material.value
             texture = os.path.join(self.armor_texture_dir,  f"{material}_{self.layer}.png")
 
-        if (not texture in self.loaded_textures.keys()) or (texture not in [img.filepath for img in bpy.data.images]):
-            image = bpy.data.images.load(texture)
-            self.loaded_textures[texture] = image
-        else:
-            image = self.loaded_textures[texture]
-
-        image_node.image = image
+        self._set_image(image_node, texture)
 
     def _handle_leather(self):
         # Move nodes
@@ -196,13 +200,7 @@ class ShaderNodeHandler:
         material = self.armor_material.value
         texture = os.path.join(self.armor_texture_dir,  f"{material}_overlay_{self.layer}.png")
 
-        if (not texture in self.loaded_textures.keys()) or (texture not in [img.filepath for img in bpy.data.images]):
-            image = bpy.data.images.load(texture)
-            self.loaded_textures[texture] = image
-        else:
-            image = self.loaded_textures[texture]
-        
-        leather_overlay_node.image = image
+        self._set_image(leather_overlay_node, texture)
 
         # repostion and connect
         leather_overlay_node.location = (base_location[0], base_location[1] + 40)
@@ -293,13 +291,8 @@ class ShaderNodeHandler:
                 else f"{self.armor_trim.value}.png"
         )
         
-        if (not texture in self.loaded_textures.keys()) or (texture not in [img.filepath for img in bpy.data.images]):
-            image = bpy.data.images.load(texture)
-            self.loaded_textures[texture] = image
-        else:
-            image = self.loaded_textures[texture]
+        self._set_image(trim_node, texture)
 
-        trim_node.image = image 
 
     def _handle_trim_emission(self):
         # Add nodes
@@ -505,13 +498,8 @@ class ShaderNodeHandler:
             "enchanted_glint_armor.png"
         )
 
-        if (not texture in self.loaded_textures.keys()) or (texture not in [img.filepath for img in bpy.data.images]):
-            image = bpy.data.images.load(texture)
-            self.loaded_textures[texture] = image
-        else:
-            image = self.loaded_textures[texture]
-            
-        enchantment_node.image = image
+        self._set_image(enchantment_node, texture)
+
 
     def _clear_nodes(self):
         for node in list(self.nodes):

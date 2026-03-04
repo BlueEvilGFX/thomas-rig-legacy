@@ -270,14 +270,6 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
                     row.alert = True
                     row.operator("thomasriglegacy.approve_script", text="Allow Execution")
 
-
-                
-
-
-
-
- 
-
             # elif "DSL"in system: # Domain Specific Language
                 # node = eval(source_string)
 
