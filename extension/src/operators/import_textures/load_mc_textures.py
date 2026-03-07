@@ -221,7 +221,6 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
 
     def extract_from_zip(self) -> bool:
         texture_path = bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures", create=True)
-        print(self.jar_path)
         textures, extracted_textures, enchanted_book = extract_from_zip(texture_path, self.jar_path)
 
         if not textures == extracted_textures:

@@ -102,7 +102,6 @@ class ShaderNodeHandler:
         )
 
     def _set_image(self, node, texture):
-        print(self.loaded_textures)
         try:
             node.image = self.loaded_textures[texture]
         except (ReferenceError, KeyError):
