@@ -1,13 +1,31 @@
 from .. import utils
+from .. import constants
 
-def draw(main_props, misc_props, layout, context, rig):
+def draw(main_props, misc_props, user_props, layout, context, rig):
     from .. import icons
+
+    # Pose / Rest Pose
+    box = layout.box().column()
+    row = box.row(align=True)
+    preferences = context.preferences.addons[constants.PACKAGE].preferences 
+    if preferences.show_pose_mode:
+        row.prop(rig.data, "pose_position", expand=True)
+    
+    row = box.row(align=True)
+    row.prop(rig.pose.bones["Root"].constraints["pre-scale"], "enabled", text="MC Scale", emboss=True, icon="CHECKBOX_DEHLT")
+    row.prop(rig.pose.bones["Root"].constraints["pre-scale"], "enabled", text="Original Scale", invert_checkbox=True, icon="CHECKBOX_DEHLT")
+ 
+
 
     box = layout.box()
     col = box.column()
 
     # misc design
-    col.prop(main_props, '["Second layer"]', toggle = True, text = "2nd Layer")
+    row = col.row(align=True)
+    row.prop(main_props, '["Second layer"]', toggle = True, text = "2nd Layer")
+    row.operator("thomasriglegacy.appendbasemesh", text="", icon="EVENT_NDOF_BUTTON_1").layer=1
+    row.operator("thomasriglegacy.appendbasemesh", text="", icon="EVENT_NDOF_BUTTON_2").layer=2
+
     col.prop(main_props, '["Smooth bends"]', toggle = True, text = "Smooth Bends")
 
     # neck
@@ -186,3 +204,73 @@ def draw(main_props, misc_props, layout, context, rig):
         th_prev = context.window_manager.thomas_rig_legacy
         enum.template_icon_view(th_prev, "misc")
         col.operator("thomasriglegacy.appendmisc", icon="ADD", text = f'<{th_prev.misc[:-4]}>')
+    
+    # user specified UI
+    col = layout.column()
+    utils.UI_Utils.spacer(col, factor = 0.3)
+    box = col.box()
+
+    row = box.row()
+    split = row.split()
+    split.prop(
+        misc_props,
+        '["UI_Script_Toggle"]',
+        text="",
+        icon="RIGHTARROW" 
+            if misc_props.get('UI_Script_Toggle')
+            else "DOWNARROW_HLT",
+        invert_checkbox=True)
+    split.enabled = misc_props['UI_Script'] is not None or len(user_props.keys()) > 0
+    row.prop(misc_props, '["UI_Script"]', text="")
+    row.prop(rig.data.collections_all["User_Properties"], "is_visible", toggle = True, icon="BONE_DATA", text="")   
+
+    if misc_props['UI_Script_Toggle'] is False:
+        if misc_props['UI_Script'] is None: #Lazy Property Display System LPDS
+            props = user_props.keys()
+            if props:
+                col = box.column()
+                for p in props:
+                    col.prop(user_props, '["%s"]' % str(p))
+        
+        else:
+
+            # extracting source code
+            source = misc_props['UI_Script']
+            source_string = source.as_string()
+
+            # check which system to use
+            system = source.lines[0].body
+        
+            if "PYTHON"in system: # Python
+                # trusted check
+                # if hash is present, the user trusted the script
+                # -> execute script
+                from ... import APPROVED_SCRIPTS
+                hash = utils.hash_string(source_string)
+
+                if hash in APPROVED_SCRIPTS:
+                    # defining namespace to restrict access
+                    namespace = {
+                        "layout" : layout,
+                        "box": box,
+                        "context" : context,
+                        "rig" : rig,
+                        "user_props" : user_props,
+                    }
+                    exec(source_string, namespace)
+                # Untrusted source -> ask for permission
+                else:
+                    row = box.row()
+                    row.label(text="This rig contains a Python UI script.", icon="ERROR")
+                    column = box.column(align=True)
+                    column.label(text="Enable only if you trust the author", icon="ERROR")
+                    column.label(icon="BLANK1", text="or reviewed the script.")
+
+                    row = box.row()
+                    row.alert = True
+                    row.operator("thomasriglegacy.approve_script", text="Allow Execution")
+
+            # elif "DSL"in system: # Domain Specific Language
+                # node = eval(source_string)
+
+                # render(node, box, context)

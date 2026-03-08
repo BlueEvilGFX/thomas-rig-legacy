@@ -121,6 +121,7 @@ class THOMASRIGLEGACY_OT_PANEL(bpy.types.Panel):
 
         main_props  = rig.pose.bones["Main_Properties"]
         misc_props  = rig.pose.bones["Misc_Properties"]
+        user_props  = rig.pose.bones["User_Properties"]
 
         r_arm_props = rig.pose.bones["R.Arm_Properties"]
         l_arm_props = rig.pose.bones["L.Arm_Properties"]
@@ -158,7 +159,7 @@ class THOMASRIGLEGACY_OT_PANEL(bpy.types.Panel):
         tab = rig.ui_tab
 
         if tab == "DESIGN":
-            design_settings.draw(main_props, misc_props, layout, context, rig)
+            design_settings.draw(main_props, misc_props, user_props, layout, context, rig)
         elif tab == "MATERIALS":
             material_settings.draw(rig, layout, main_props)
         else:

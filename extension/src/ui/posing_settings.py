@@ -8,7 +8,7 @@ def draw(layout, rig, main_props):
     l_leg_props = rig.pose.bones["L.Leg_Properties"]
     pupil_props = rig.pose.bones["Pupils_controller"]
 
-    layout.box().prop(rig, "show_in_front", toggle = True)
+    layout.box().prop(rig, "show_in_front", toggle = True, icon="BONE_DATA")
 
     box = layout.box()
     col = box.column()

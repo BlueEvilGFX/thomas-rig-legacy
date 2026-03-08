@@ -1,8 +1,10 @@
 import bpy
 import addon_utils
+import hashlib
+
 from . import constants
 
-from typing import List
+from typing import List, Optional, Tuple
 
 def add_modifier_armature(rig, obj) -> bpy.types.Modifier:
     modifier = obj.modifiers.new(name = "Skeleton", type = "ARMATURE")
@@ -128,3 +130,18 @@ def get_ext_version() -> List[int]:
     version = result.bl_info['version']
     constants.EXT_VERSION = version
     return version
+
+def get_image_size(filepath: str) -> Optional[Tuple[int, int]]:
+    """returns the size of the image (width, height)"""
+    if not filepath:
+        return None
+
+    try:
+        from PIL import Image
+        with Image.open(filepath) as img:
+            return img.size  # (width, height)
+    except Exception:
+        return None
+
+def hash_string(text: str) -> str:
+    return hashlib.sha256(text.encode('utf-8')).hexdigest()

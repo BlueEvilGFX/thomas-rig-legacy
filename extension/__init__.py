@@ -1,22 +1,23 @@
-import bpy
+from .src import preferences, icons, properties, operators, append_ui, ui
 
-from .src import preferences
-from .src import icons
-from .src import properties
-from .src import operators
-from .src import append_ui
-from .src import ui
+# For the UI users can add custom UI scripts.
+# Users must approve them first to be displayed.
+# Using hashes to detect change in file etc.
+# -> script hashes of user ui scripts
+APPROVED_SCRIPTS = set()
 
-modules = (
-    "preferences",
-    "icons",
-    "properties",
-    "operators",
-    "append_ui",
-    "ui",
-)
+def register():
+    preferences.register()
+    icons.register()
+    properties.register()
+    operators.register()
+    append_ui.register()
+    ui.register()
 
-register, unregister = bpy.utils.register_submodule_factory(
-    module_name =  __name__,
-    submodule_names = modules
-)
+def unregister():
+    ui.unregister()
+    append_ui.unregister()
+    operators.unregister()
+    properties.unregister()
+    icons.unregister()
+    preferences.unregister()

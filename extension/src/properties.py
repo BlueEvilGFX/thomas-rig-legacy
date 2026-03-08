@@ -1,7 +1,7 @@
 import os
 import bpy
 from bpy.types import PropertyGroup
-from bpy.props import PointerProperty, BoolProperty, EnumProperty
+from bpy.props import PointerProperty, BoolProperty, EnumProperty, FloatProperty
 from bpy.types import WindowManager
 
 from . import constants
@@ -35,6 +35,8 @@ class SceneProperty(PropertyGroup):
 
     reference : PointerProperty(type=bpy.types.Object, update = update_reference) # type: ignore
     reference_toggle : BoolProperty(default=True, update=update_reference_toggle) # type: ignore
+
+    progress_bar : FloatProperty(min=0.0, max=1.0) # type: ignore
 
 
 class PreviewsProperty(PropertyGroup):
