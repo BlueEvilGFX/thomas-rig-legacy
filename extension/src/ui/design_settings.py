@@ -205,72 +205,90 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
         enum.template_icon_view(th_prev, "misc")
         col.operator("thomasriglegacy.appendmisc", icon="ADD", text = f'<{th_prev.misc[:-4]}>')
     
-    # user specified UI
+    # -------------------- USER PROPS --------------------
+    if user_props:
+        draw_user_props(context, rig, layout, misc_props, user_props)
+
+
+def draw_user_props(context, rig, layout, misc_props, user_props):
     col = layout.column()
     utils.UI_Utils.spacer(col, factor = 0.3)
     box = col.box()
 
+    # Header
     row = box.row()
     split = row.split()
+
+    # Unfold toggle
+    target = '["UI_Script_Toggle"]'
+    icon = "RIGHTARROW" if misc_props.get('UI_Script_Toggle') \
+        else "DOWNARROW_HLT"
+
     split.prop(
         misc_props,
-        '["UI_Script_Toggle"]',
+        target,
         text="",
-        icon="RIGHTARROW" 
-            if misc_props.get('UI_Script_Toggle')
-            else "DOWNARROW_HLT",
-        invert_checkbox=True)
+        icon=icon,
+        invert_checkbox=True
+    )
+    
+    # Script selector & Bone Visibility
     split.enabled = misc_props['UI_Script'] is not None or len(user_props.keys()) > 0
     row.prop(misc_props, '["UI_Script"]', text="")
     row.prop(rig.data.collections_all["User_Properties"], "is_visible", toggle = True, icon="BONE_DATA", text="")   
 
-    if misc_props['UI_Script_Toggle'] is False:
-        if misc_props['UI_Script'] is None: #Lazy Property Display System LPDS
-            props = user_props.keys()
-            if props:
-                col = box.column()
-                for p in props:
-                    col.prop(user_props, '["%s"]' % str(p))
-        
-        else:
+    # Property Display
+    if misc_props['UI_Script_Toggle']: # inverted
+        return
+    
+    # Lazy Property Display System (LPDS)
+    if misc_props['UI_Script'] is None:
+        props = user_props.keys()
 
-            # extracting source code
-            source = misc_props['UI_Script']
-            source_string = source.as_string()
+        if props:
+            col = box.column()
+            for p in props:
+                col.prop(user_props, '["%s"]' % str(p))
+    
+    else:
+        # extracting source code
+        source = misc_props['UI_Script']
+        source_string = source.as_string()
 
-            # check which system to use
-            system = source.lines[0].body
-        
-            if "PYTHON"in system: # Python
-                # trusted check
-                # if hash is present, the user trusted the script
-                # -> execute script
-                from ... import APPROVED_SCRIPTS
-                hash = utils.hash_string(source_string)
+        # check which system to use
+        system = source.lines[0].body
+    
+        if "PYTHON" in system: # Python
+            # trusted check
+            # if hash is present, the user trusted the script
+            # -> execute script
+            from ... import APPROVED_SCRIPTS
+            hash = utils.hash_string(source_string)
 
-                if hash in APPROVED_SCRIPTS:
-                    # defining namespace to restrict access
-                    namespace = {
-                        "layout" : layout,
-                        "box": box,
-                        "context" : context,
-                        "rig" : rig,
-                        "user_props" : user_props,
-                    }
-                    exec(source_string, namespace)
-                # Untrusted source -> ask for permission
-                else:
-                    row = box.row()
-                    row.label(text="This rig contains a Python UI script.", icon="ERROR")
-                    column = box.column(align=True)
-                    column.label(text="Enable only if you trust the author", icon="ERROR")
-                    column.label(icon="BLANK1", text="or reviewed the script.")
+            if hash in APPROVED_SCRIPTS:
+                # defining namespace to restrict access
+                namespace = {
+                    "layout" : layout,
+                    "box": box,
+                    "context" : context,
+                    "rig" : rig,
+                    "user_props" : user_props,
+                }
+                exec(source_string, namespace)
+                
+            # Untrusted source -> ask for permission
+            else:
+                row = box.row()
+                row.label(text="This rig contains a Python UI script.", icon="ERROR")
+                column = box.column(align=True)
+                column.label(text="Enable only if you trust the author", icon="ERROR")
+                column.label(icon="BLANK1", text="or reviewed the script.")
 
-                    row = box.row()
-                    row.alert = True
-                    row.operator("thomasriglegacy.approve_script", text="Allow Execution")
+                row = box.row()
+                row.alert = True
+                row.operator("thomasriglegacy.approve_script", text="Allow Execution")
 
-            # elif "DSL"in system: # Domain Specific Language
-                # node = eval(source_string)
+        # elif "DSL"in system: # Domain Specific Language
+            # node = eval(source_string)
 
-                # render(node, box, context)
+            # render(node, box, context)

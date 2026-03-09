@@ -115,13 +115,11 @@ class THOMASRIGLEGACY_OT_PANEL(bpy.types.Panel):
 
             utils.UI_Utils.spacer(self.layout, 1)
 
-        # ------------
 
-        layout = self.layout
-
+        # -------------------- PROPERTIES --------------------
         main_props  = rig.pose.bones["Main_Properties"]
         misc_props  = rig.pose.bones["Misc_Properties"]
-        user_props  = rig.pose.bones["User_Properties"]
+        user_props  = rig.pose.bones.get("User_Properties", None) # >= v1.2.0
 
         r_arm_props = rig.pose.bones["R.Arm_Properties"]
         l_arm_props = rig.pose.bones["L.Arm_Properties"]
@@ -130,6 +128,8 @@ class THOMASRIGLEGACY_OT_PANEL(bpy.types.Panel):
         pupil_props = rig.pose.bones["Pupils_controller"]
 
 
+        # ------------------------ UI ------------------------
+        layout = self.layout
         # search function
         layout.prop(misc_props, '["search"]')
         if misc_props["search"] != "":
