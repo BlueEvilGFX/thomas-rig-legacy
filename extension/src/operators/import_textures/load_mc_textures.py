@@ -5,6 +5,7 @@ import PIL.Image
 import PIL.ImageChops
 import bpy
 import PIL
+from dataclasses import dataclass
 
 from bpy_extras.io_utils import ImportHelper
 
@@ -18,6 +19,15 @@ from ...constants import MIN_VERSION
 
 def parse_version(v: str):
     return tuple(int(x) for x in v.split('.')) 
+
+
+@dataclass
+class LauncherPaths:
+    mojang: list[str]
+    prism: list[str]
+    curseforge: list[str]
+    modrinth: list[str]
+
 
 class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
     bl_idname = "thomasriglegacy.mc_textures_import"
@@ -157,53 +167,29 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
     
     def get_launcher_paths(self) -> dict[str, list[str]]:
         """Returns a list of paths of the launchers version directory"""
-        home = os.path.expanduser('~')
-
-        mc = None
-        prism_paths = []
-        curseforge = None
+        launcher_paths: LauncherPaths = None
 
         # Windows
         if os.name == 'nt':
-            appdata = os.getenv('APPDATA')
-
-            mc = os.path.join(appdata, '.minecraft', 'versions')
-            prism_paths = [
-                os.path.join(appdata, 'PrismLauncher', 'libraries', 'com', 'mojang', 'minecraft', 'Install', 'versions')
-            ]
-            curseforge = os.path.join(appdata, 'curseforge', 'minecraft', 'install')
+            launcher_paths = self.get_windows_paths()
 
         # macOS & Linux
         elif os.name == 'posix':
 
             # macOS
             if 'darwin' in os.uname().sysname.lower():
-                mc = os.path.join(home, 'Library', 'Application Support', 'minecraft', 'versions')
-                prism_paths = [
-                    os.path.join(home, 'Library', 'Application Support', 'PrismLauncher',
-                                'libraries', 'com', 'mojang', 'minecraft')
-                ]
+                launcher_paths = self.get_darwin_paths()
 
             # Linux
             else:
-                mc = os.path.join(home, '.minecraft', 'versions')
-
-                prism_paths = [
-                    # Standard install
-                    os.path.join(home, '.local', 'share', 'PrismLauncher',
-                                'libraries', 'com', 'mojang', 'minecraft'),
-
-                    # Flatpak install
-                    os.path.join(home, '.var', 'app', 'org.prismlauncher.PrismLauncher',
-                                'data', 'PrismLauncher', 'libraries', 'com', 'mojang', 'minecraft')
-                ]
+                return self.get_linux_paths()
 
         # Launcher Install check
         # Flatten everything into one list
         launchers = {
-            "Mojang": [mc],
-            "Prism": prism_paths,
-            "Curseforge": [curseforge]
+            "Mojang": launcher_paths.mojang,
+            "Prism": launcher_paths.prism,
+            "Curseforge": launcher_paths.curseforge
         }
 
         # Keep only existing directories
@@ -233,6 +219,71 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
         
         return True
 
+    # -------------------- Launcher Paths --------------------
+    
+    def get_windows_paths(self) -> LauncherPaths:
+        appdata = os.getenv('APPDATA')
+
+        mojang = os.path.join(appdata, '.minecraft', 'versions')
+
+        prism = os.path.join(appdata, 'PrismLauncher', 'libraries', 'com', 'mojang', 'minecraft', 'Install', 'versions')
+
+        curseforge = os.path.join(appdata, 'curseforge', 'minecraft', 'install')
+
+        return LauncherPaths(
+            mojang=[mojang],
+            prism=[prism],
+            curseforge=[curseforge]
+        )
+    
+    def get_darwin_paths(self) -> LauncherPaths:
+        home = os.path.expanduser('~')
+
+        mojang = os.path.join(home, 'Library', 'Application Support', 'minecraft', 'versions')
+
+        prism = os.path.join(home, 'Library', 'Application Support', 'PrismLauncher',
+                        'libraries', 'com', 'mojang', 'minecraft')
+        
+        curseforge = os.path.join(home, 'Library', 'Application Support', 'CurseForge',
+                        'Minecraft', 'install')
+
+        return LauncherPaths(
+            mojang=[mojang],
+            prism=[prism],
+            curseforge=[curseforge]
+        )
+    
+    def get_linux_paths(self) -> LauncherPaths:
+        home = os.path.expanduser('~')
+
+
+        mojang = os.path.join(home, '.minecraft', 'versions')
+
+        prism_paths = [
+            # Standard install
+            os.path.join(home, '.local', 'share', 'PrismLauncher',
+                        'libraries', 'com', 'mojang', 'minecraft'),
+
+            # Flatpak install
+            os.path.join(home, '.var', 'app', 'org.prismlauncher.PrismLauncher',
+                        'data', 'PrismLauncher', 'libraries', 'com', 'mojang', 'minecraft')
+        ]
+
+        curseforge = [
+            # Standard install
+            os.path.join(home, '.local', 'share', 'curseforge',
+                        'minecraft', 'install'),
+            # Flatpak install
+            os.path.join(home, '.var', 'app', 'org.overwolf.CurseForge',
+                        'data', 'curseforge', 'minecaft', 'install')
+        ]
+
+        return LauncherPaths(
+            mojang=[mojang],
+            prism=prism_paths,
+            curseforge=curseforge
+        )
+    
 
 class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
     bl_idname = "thomasriglegacy.mc_textures_import_manually" 
