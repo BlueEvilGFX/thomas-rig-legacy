@@ -17,6 +17,5 @@ class Errors(Enum):
             Errors.MIN_VERSION_EXCEEDED: f'Minimum version requirement {MIN_VERSION} not met',
             Errors.VERSION_FILE_NOT_FOUND: "MC Version.jar file not found",
             Errors.NOT_ALL_TEXTURES: "Not all needed textures found",
-            Errors.ENCHANTED_BOOK: "Could not create enchanted book icon"  
         }
         return descriptions.get(self, "Unknown error.")
