@@ -3,7 +3,7 @@ import bpy
 from .. import utils
 from .. import constants
 
-MAX_VERSION = (1, 2, 1)
+MAX_VERSION = (1, 2, 2)
 MIN_VERSION =  (1, 2, 0)
 
 class THOMAS_RIG_UPDATE_RIG(bpy.types.Operator):
@@ -53,6 +53,9 @@ class THOMAS_RIG_UPDATE_RIG(bpy.types.Operator):
         if tuple(rig_version) < (1, 2, 1):
            Updater.update_to_1_2_1(self)
 
+        if tuple(rig_version) < (1, 2 ,2):
+            Updater.update_to_1_2_2(self)
+
         # set rig version to newest
         rig["rig_version"] = ext_version
         rig.data.update_tag()
@@ -68,6 +71,9 @@ class Updater():
             if obj.name == "Head_NoDeform":
                 obj.data.uv_layers['UVMap.001'].active = True
                 return
+            
+    def update_to_1_2_2(self):
+        return
 
     # this is one example how to use this class
 

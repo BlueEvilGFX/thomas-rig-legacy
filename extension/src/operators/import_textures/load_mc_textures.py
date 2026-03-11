@@ -1,12 +1,9 @@
 import os
 import re
 import zipfile
-import PIL.Image
-import PIL.ImageChops
 import bpy
-import PIL
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
 
 from bpy_extras.io_utils import ImportHelper
 
@@ -213,14 +210,10 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
 
     def extract_from_zip(self) -> bool:
         texture_path = bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures", create=True)
-        textures, extracted_textures, enchanted_book = extract_from_zip(texture_path, self.jar_path)
+        textures, extracted_textures = extract_from_zip(texture_path, self.jar_path)
 
         if not textures == extracted_textures:
             self.error = Errors.NOT_ALL_TEXTURES
-            return False
-        
-        if not enchanted_book:
-            self.error = Errors.ENCHANTED_BOOK
             return False
         
         return True
@@ -314,7 +307,7 @@ class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
         preferences = context.preferences.addons[constants.PACKAGE].preferences
 
         texture_path = bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures", create=True)
-        textures, extracted_textures, enchanted_book = extract_from_zip(texture_path, filepath)
+        textures, extracted_textures = extract_from_zip(texture_path, filepath)
 
         if not textures == extracted_textures:
             self.error = Errors.NOT_ALL_TEXTURES
@@ -322,14 +315,7 @@ class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
             self.report({"WARNING"}, self.error.error_text())
             bpy.ops.wm.save_userpref()
             return{'CANCELLED'}
-        
-        if not enchanted_book:
-            self.error = Errors.ENCHANTED_BOOK
-            preferences.mc_textures_ignore = True
-            self.report({"WARNING"}, self.error.error_text())
-            bpy.ops.wm.save_userpref()
-            return{'CANCELLED'}
-        
+                
         # set addon preferences texture loaded property
         preferences.mc_textures_loaded = True
         bpy.ops.wm.save_userpref()
@@ -367,7 +353,7 @@ def extract_from_zip(texture_path, jar_path):
         trims_zip_dir : {"textures/trims/entity/humanoid/", "textures/trims/entity/humanoid_leggings/"},
         armor_dir : {"textures/entity/equipment/humanoid/", "textures/entity/equipment/humanoid_leggings/", "textures/misc/enchanted_glint_armor.png"},
         icon_dir : {"textures/item/iron_chestplate.png", "textures/item/elytra.png", "textures/item/glow_item_frame.png", "enchanted_book.png"},
-        texture_path : {"textures/entity/equipment/wings/elytra.png", "textures/misc/enchanted_glint_item.png"}
+        texture_path : {"textures/entity/equipment/wings/elytra.png"}
     }
 
     extracted_textures = {}
@@ -406,23 +392,5 @@ def extract_from_zip(texture_path, jar_path):
                     # Extracted textures (optimized with `.setdefault()`)
                     extracted_textures.setdefault(dir, set()).add(matched_texture)
                     break  # Stop after first match
-
-    # enchanted book -> overlay with enchanted texture
-    try:
-        book_path = os.path.join(bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures"),"icons" , "enchanted_book.png")
-        book = PIL.Image.open(book_path).convert("RGBA")
-        enchant_glint = PIL.Image.open(os.path.join(bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures"), "enchanted_glint_item.png")).convert("RGBA")
-
-        enchant_glint = enchant_glint.resize(book.size, PIL.Image.Resampling.BILINEAR)
-
-        # overlay using "add" and combine alpha channel
-        added = PIL.ImageChops.add(book, enchant_glint)
-        result = PIL.Image.new("RGBA", book.size)
-        result.paste(added, mask=book.split()[3])
-
-        result.save(book_path)
-        enchanted_book = True
-    except:
-        enchanted_book = False
     
-    return textures, extracted_textures, enchanted_book
+    return textures, extracted_textures
