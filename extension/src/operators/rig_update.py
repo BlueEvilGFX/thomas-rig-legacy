@@ -3,7 +3,7 @@ import bpy
 from .. import utils
 from .. import constants
 
-MAX_VERSION = (1, 2, 2)
+MAX_VERSION = (1, 2, 3)
 MIN_VERSION =  (1, 2, 0)
 
 class THOMAS_RIG_UPDATE_RIG(bpy.types.Operator):
@@ -56,6 +56,9 @@ class THOMAS_RIG_UPDATE_RIG(bpy.types.Operator):
         if tuple(rig_version) < (1, 2 ,2):
             Updater.update_to_1_2_2(self)
 
+        if tuple(rig_version) < (1, 2 ,3):
+            Updater.update_to_1_2_3(self)
+
         # set rig version to newest
         rig["rig_version"] = ext_version
         rig.data.update_tag()
@@ -73,6 +76,9 @@ class Updater():
                 return
             
     def update_to_1_2_2(self):
+        return
+    
+    def update_to_1_2_3(self):
         return
 
     # this is one example how to use this class

@@ -146,16 +146,12 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
 
                     if len(int_version) < 3:
                         int_version.append(0)
-                    
-                    not_sufficient = False
-                    for i in range(0, 3):
-                        not_sufficient = not_sufficient or int_version[i] < MIN_VERSION[i]
-    
 
-                    if not_sufficient:
+                    #not sufficient mc version
+                    if tuple(int_version) < tuple(MIN_VERSION):
                         _error = Errors.MIN_VERSION_EXCEEDED
                         continue
-
+         
                     # check if version.jar exists
                     # filename is <version>.jar for original launcher
                     # different for other launchers
