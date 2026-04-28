@@ -312,12 +312,12 @@ class ShaderNodeHandler:
         new_location = tuple(x + y for x, y in zip(base_location, offset))
         emission_value_node.location = new_location
 
-        # mix shader
-        shader_mix = self.nodes.new("ShaderNodeMixShader")
-        self._set_naming(shader_mix, ShaderNodeEnum.TRIM_MIX_SHADER)
+        # add shader
+        shader_add = self.nodes.new("ShaderNodeAddShader")
+        self._set_naming(shader_add, ShaderNodeEnum.TRIM_ADD_SHADER)
         offset = (350 , 0)
         new_location = tuple(x + y for x, y in zip(base_location, offset))
-        shader_mix.location = new_location
+        shader_add.location = new_location
 
         # light path | camera ray
         ligh_path = self.nodes.new("ShaderNodeLightPath")
@@ -359,9 +359,9 @@ class ShaderNodeHandler:
         trim_colour_node = self._get_node(ShaderNodeEnum.TRIM_COLOUR)
 
         self._create_link(trim_colour_node, "Color", shader_emission, "Color")
-        self._create_link(shader_emission, 0, shader_mix, 2)
-        self._create_link(bsdf_node, 0, shader_mix, 1)
-        self._create_link(shader_mix, 0, output, 0)
+        self._create_link(shader_emission, 0, shader_add, 1)
+        self._create_link(bsdf_node, 0, shader_add, 0)
+        self._create_link(shader_add, 0, output, 0)
         self._create_link(ligh_path, "Is Camera Ray", blow_out_mix_node, 'A')
         self._create_link(emission_value_node, 0, blow_out_mix_colour_node, 1)
         self._create_link(blow_out_value_node, 0, blow_out_mix_node, 0)

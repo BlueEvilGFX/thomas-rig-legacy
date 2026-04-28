@@ -72,6 +72,7 @@ class ShaderNodeEnum(Enum):
 
     TRIM_EMISSION_SHADER = "Trim: Emission"
     TRIM_MIX_SHADER = "Trim: Mix Shader"
+    TRIM_ADD_SHADER = "Trim: Add Shader"
     TRIM_EMISSION_VALUE = "Trim: Emission Value"
     TRIM_EMISSION_BLOW_OUT = "Trim: Blow out"
     TRIM_EMISSION_MIX_BLOW_OUT = "Trim: Emission Mix Blow out"
