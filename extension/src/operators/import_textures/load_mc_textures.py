@@ -151,7 +151,7 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
                     if tuple(int_version) < tuple(MIN_VERSION):
                         _error = Errors.MIN_VERSION_EXCEEDED
                         continue
-         
+
                     # check if version.jar exists
                     # filename is <version>.jar for original launcher
                     # different for other launchers
@@ -180,7 +180,7 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
                 launcher_paths = self.get_darwin_paths()
             # Linux
             else:
-                return self.get_linux_paths()
+                launcher_paths = self.get_linux_paths()
 
         # Launcher Install check
         # Flatten everything into one list
@@ -287,7 +287,7 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
             curseforge=curseforge,
             modrinth=modrinth
         )
-    
+
 
 class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
     bl_idname = "thomasriglegacy.mc_textures_import_manually" 
@@ -300,6 +300,11 @@ class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
 
     def execute(self, context):
         filepath = self.filepath
+
+        if os.path.isdir(filepath):
+            self.report({"WARNING"}, Errors.WRONG_FILE_FORMAT.error_text())
+            return {'CANCELLED'}
+
         preferences = context.preferences.addons[constants.PACKAGE].preferences
 
         texture_path = bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures", create=True)
