@@ -18,6 +18,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
     second_layer_alternative_placement : BoolProperty(default=False) #type: ignore
     show_pose_mode: BoolProperty(default=True) #type: ignore
     default_player_rig_scale: BoolProperty(default=False) #type: ignore
+    verbose : BoolProperty(default=False) #type: ignore
 
     def draw(self, context):
         pcoll = icons.thomas_icons["thomas_legacy"]
@@ -55,6 +56,12 @@ class AddonPreferences(bpy.types.AddonPreferences):
         right = split
         right.label(text="Toggles the default player rig scale")
 
+        settings_col.prop(
+            self,
+            "verbose",
+            text="toggle verbose settings for operators"
+        )
+
         col = layout.box().column()
         if not self.mc_textures_loaded:
             row = col.row()
@@ -85,7 +92,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
                 row.operator("thomasriglegacy.mc_textures_import_manually", text = "import textures", icon = "IMPORT")
             else:
                 row.progress( text="Loading Files", factor=progress, type='BAR')
-  
+
         # info text
         # Get the 3D View area
         for area in context.screen.areas:
@@ -125,6 +132,6 @@ def register():
         preferences.mc_textures_loaded = False
         preferences.previous_version = ext_version
 
-  
+
 def unregister():
     bpy.utils.unregister_class(AddonPreferences)

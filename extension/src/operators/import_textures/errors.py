@@ -8,6 +8,7 @@ class Errors(Enum):
     VERSION_FILE_NOT_FOUND = auto()
     NOT_ALL_TEXTURES = auto()
     ENCHANTED_BOOK = auto()
+    WRONG_FILE_FORMAT = auto()
 
 
     def error_text(self):
@@ -17,5 +18,6 @@ class Errors(Enum):
             Errors.MIN_VERSION_EXCEEDED: f'Minimum version requirement {MIN_VERSION} not met',
             Errors.VERSION_FILE_NOT_FOUND: "MC Version.jar file not found",
             Errors.NOT_ALL_TEXTURES: "Not all needed textures found",
+            Errors.WRONG_FILE_FORMAT: "Wrong file format selected; e.g. a folder",
         }
         return descriptions.get(self, "Unknown error.")
