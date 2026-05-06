@@ -27,7 +27,7 @@ class THOMAS_RIG_SKIN_DOWNLOAD(bpy.types.Operator):
         layout = self.layout
         layout.label(text="Please enter the username from which you want to get the skin.", icon='FILE_TEXT')
         layout.prop(self, 'user_name')
-   
+
     def execute(self, context):
         # download not successfull
         if not self.download_init():

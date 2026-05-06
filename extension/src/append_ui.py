@@ -69,11 +69,11 @@ class OBJECT_MT_APPEND(bpy.types.Operator):
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #                   (un)register
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          
+
 def register():
     bpy.utils.register_class(OBJECT_MT_APPEND)
     bpy.types.VIEW3D_MT_add.append(menu_func)
-  
+
 def unregister():
     bpy.types.VIEW3D_MT_add.remove(menu_func)
     bpy.utils.unregister_class(OBJECT_MT_APPEND)
