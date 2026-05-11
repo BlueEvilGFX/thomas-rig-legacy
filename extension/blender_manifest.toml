@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "thomas_rig_legacy"
-version = "1.2.5"
+version = "1.2.6"
 name = "Thomas Rig Legacy"
 tagline = "Addon for this rig"
 maintainer = "BlueEvilGFX"
@@ -14,8 +14,6 @@ blender_version_min = "4.2.0"
 license = [
   "SPDX:GPL-3.0-or-later",
 ]
-
-platforms = ["windows-x64", "macos-arm64", "linux-x64"]
 
 wheels = []
 
