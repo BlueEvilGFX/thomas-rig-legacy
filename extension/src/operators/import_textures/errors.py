@@ -9,7 +9,7 @@ class Errors(Enum):
     NOT_ALL_TEXTURES = auto()
     ENCHANTED_BOOK = auto()
     WRONG_FILE_FORMAT = auto()
-
+    UNKNOWN_ERROR = auto()
 
     def error_text(self):
         descriptions = {
@@ -19,5 +19,6 @@ class Errors(Enum):
             Errors.VERSION_FILE_NOT_FOUND: "MC Version.jar file not found",
             Errors.NOT_ALL_TEXTURES: "Not all needed textures found",
             Errors.WRONG_FILE_FORMAT: "Wrong file format selected; e.g. a folder",
+            Errors.UNKNOWN_ERROR: "Unknown Error",
         }
         return descriptions.get(self, "Unknown error.")

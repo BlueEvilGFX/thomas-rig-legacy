@@ -88,8 +88,16 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
 
             # Run next step
             # every error should be cought in the steps and saved to self.error
-            self.steps[self._step](context)
+            try:
+                self.steps[self._step](context)
+            except Exception as e:
+                self.error = Errors.UNKNOWN_ERROR # Oder ein passender Fehler
+                print(f"Error in step {self._step}: {e}")
+
             if self.error:
+                context.window_manager.event_timer_remove(self._timer)
+                context.scene.thomas_rig_legacy.progress_bar = 0 # reset timer
+                
                 self._preferences.mc_textures_ignore = True
                 self.report({'WARNING'}, self.error.error_text())
                 bpy.ops.wm.save_userpref()
@@ -196,7 +204,7 @@ class MC_TEXTURES_LOAD_OT_SET(bpy.types.Operator):
             Launchers.MOJANG: launcher_paths.mojang,
             Launchers.PRISM: launcher_paths.prism,
             Launchers.CURSEFORGE: launcher_paths.curseforge,
-            Launchers.PRISM: launcher_paths.modrinth
+            Launchers.MODRINTH: launcher_paths.modrinth
         }
 
         # Keep only existing directories
@@ -405,7 +413,7 @@ def extract_from_zip(texture_path, jar_path):
                         target.write(source.read())
 
                     # Found a match -> no need to check other prefixes
-                    extracted_textures.setdefault(target_folder, []).append(target_name)
+                    extracted_textures.setdefault(source_prefix, []).append(target_name)
                     break
 
     return extraction_map, extracted_textures
@@ -423,7 +431,7 @@ def verify_extraction_complete(extraction_map, extracted_textures) -> bool:
 
     for source_prefix, target_folder in extraction_map.items():
         # Get the files that were saved to the folder associated with this prefix
-        found_files = extracted_textures.get(target_folder, [])
+        found_files = extracted_textures.get(source_prefix, [])
 
         # Logic: If it's a specific file (ends in .png), check for that specific name.
         # If it's a folder prefix, check if the folder got ANY files.
