@@ -62,30 +62,40 @@ def draw_armor_ui(op, context):
         size_1 = get_image_size(op.filepath_1)
         size_2 = get_image_size(op.filepath_2)
 
-        correct_size_1 = size_1 == (64, 32) if size_1 else True
-        correct_size_2 = size_2 == (64, 32) if size_2 else True
+        # correct size if x = 2y, default (64, 32)
+        correct_size_1 = size_1 and size_1[0] == 2*size_1[1]
+        correct_size_2 = size_2 and size_2[0] == 2*size_2[1]
+
         file_ending_1 = op.filepath_1.split('.')[-1]
         file_ending_2 = op.filepath_2.split('.')[-1]
 
         row = column.row()
-        row.alert = not correct_size_1
+        row.alert = not correct_size_1 and bool(size_1)
         row.prop(op, "filepath_1")
 
         row = column.row()
-        row.alert = not correct_size_2
+        row.alert = not correct_size_2 and bool(size_2)
         row.prop(op, "filepath_2")
 
-        layer_1 = size_1 is not None
-        layer_2 = size_2 is not None
-
         # -------------------- SETTINGS -----------------------
-        _draw_default(op, column, icon_dict, pcoll, False, layer_1, layer_2)
+        _draw_default(
+            op, 
+            column, 
+            icon_dict, 
+            pcoll, 
+            False, 
+            bool(correct_size_1 and bool(size_1)),
+            bool(correct_size_2 and bool(size_2))
+        )
         
         # -------------------- WARNING ------------------------
         wrong_format = (file_ending_1.lower() != "png" and file_ending_1 != "") \
                     or (file_ending_2.lower() != "png" and file_ending_2 != "")
 
-        if not correct_size_1 or not correct_size_2 or wrong_format:
+        if (size_1 is not None and not correct_size_1)\
+                or (size_2 is not None and not correct_size_2)\
+                or wrong_format:
+
             UI_Utils.spacer(op.layout, 0.3)
             box = op.layout.box()
             box.alignment = "CENTER"

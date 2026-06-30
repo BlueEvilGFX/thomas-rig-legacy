@@ -133,15 +133,17 @@ def get_ext_version() -> List[int]:
 
 def get_image_size(filepath: str) -> Optional[Tuple[int, int]]:
     """returns the size of the image (width, height)"""
-    if not filepath:
-        return None
+    import OpenImageIO as oiio
+    
+    inp = oiio.ImageInput.open(filepath)
+    if inp:
+        spec = inp.spec()
+        xres = spec.width
+        yres = spec.height
+        inp.close()
 
-    try:
-        from PIL import Image
-        with Image.open(filepath) as img:
-            return img.size  # (width, height)
-    except Exception:
-        return None
+        return [xres, yres]
+    return None
 
 def hash_string(text: str) -> str:
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
