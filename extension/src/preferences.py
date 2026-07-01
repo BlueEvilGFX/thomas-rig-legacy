@@ -10,8 +10,8 @@ class AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = PACKAGE
     
     # -------------------- INTERNAL --------------------
-    mc_textures_loaded : BoolProperty(default=False) #type: ignore
     mc_textures_ignore : BoolProperty(default=False) #type: ignore
+    mc_textures_loaded : BoolProperty(default=False) #type: ignore
     previous_version : IntVectorProperty(default=(0, 0, 0), size=3) #type: ignore
 
     # -------------------- SETTINGS --------------------
@@ -68,27 +68,18 @@ class AddonPreferences(bpy.types.AddonPreferences):
             row.label(text="Textures not loaded", icon = "CANCEL")
             row.label(text="Using fallback textures", icon = "ERROR")
         
-        alert = (self.mc_textures_loaded == False and self.mc_textures_ignore == False)
+        alert = (self.mc_textures_loaded == False)
 
         icon = pcoll["Thomas Rig Legacy"].icon_id
         if alert:
-            split = col.split(factor=0.8)
-            split.alert = True
-            split.operator("thomasriglegacy.mc_textures_import", text = "(re)load MC textures", icon_value = icon)
-            split.alert = False
-            split.operator("thomasriglegacy.mc_textures_skip")
-
-            split = col.split(factor=0.8)
-            split.alert = True
-            split.operator("thomasriglegacy.mc_textures_import_manually", text = "import textures", icon = "IMPORT")
-            split.alert = False
-            split.operator("thomasriglegacy.mc_textures_skip")
+            row = col.row()
+            row.alert = True
+            row.operator("thomasriglegacy.mc_textures_import_manually", text = "import textures", icon = "IMPORT")
         
         else:
             row = col.row()
             progress = context.scene.thomas_rig_legacy.progress_bar
             if progress == 0:
-                row.operator("thomasriglegacy.mc_textures_import", text = "(re)load MC textures", icon_value = icon)
                 row.operator("thomasriglegacy.mc_textures_import_manually", text = "import textures", icon = "IMPORT")
             else:
                 row.progress( text="Loading Files", factor=progress, type='BAR')
@@ -128,7 +119,6 @@ def register():
     ext_version = utils.get_ext_version()
 
     if previous_version != ext_version:
-        preferences.mc_textures_ignore = False
         preferences.mc_textures_loaded = False
         preferences.previous_version = ext_version
 

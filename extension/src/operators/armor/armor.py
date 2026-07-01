@@ -166,7 +166,12 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
                     continue
 
                 objs = loader.load_custom(armor_part, armor_type)
+
+                if not self.parent:
+                    continue
+
                 modifiers.apply_custom_modifiers(objs, armor_part, armor_type)
+
                 for obj in objs:
                     if armor_type in {'Scuba'}:
                         drivers.apply_default_drivers(obj, armor_part)
@@ -195,8 +200,15 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
 
                 if armor_part in {ArmorPartEnum.HELMET, ArmorPartEnum.CHESTPLATE}:
                     filepath = self.filepath_1
+                    print("FILEPATH", filepath)
+                    if not filepath:
+                        self.helmet = False
+                        self.chestplate = False
                 else:
                     filepath = self.filepath_2
+                    if not filepath:
+                        self.leggings = False
+                        self.boots = False
 
                 self._process_armor_part(
                     armor_part, context, loader, modifiers, drivers, cleanup, node_handler,

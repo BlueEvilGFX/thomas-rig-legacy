@@ -11,20 +11,15 @@ def menu_func(self, context):
 
     preferences = context.preferences.addons[constants.PACKAGE].preferences 
     loaded = preferences.mc_textures_loaded
-    ignore = preferences.mc_textures_ignore
-    if loaded or ignore:
-        layout.operator("view3d.thomasriglegacyappend", icon_value = custom_icon)
-        armor_op = layout.operator("thomasriglegacy.addarmor", text = "Add Minecraft Armor", icon = "MATCLOTH")
-        armor_op.parent = False
-        # armor_op.helmet = True
-        # armor_op.chestplate = True
-        # armor_op.leggings = True
-        # armor_op.boots = True
-        armor_op.loaded = loaded
 
-    else:
-        layout.alert = True
-        layout.operator("thomasriglegacy.mc_textures_import", icon_value = custom_icon)
+    layout.operator("view3d.thomasriglegacyappend", icon_value = custom_icon)
+    armor_op = layout.operator("thomasriglegacy.addarmor", text = "Add Minecraft Armor", icon = "MATCLOTH")
+    armor_op.parent = False
+    # armor_op.helmet = True
+    # armor_op.chestplate = True
+    # armor_op.leggings = True
+    # armor_op.boots = True
+    armor_op.loaded = loaded
 
 class OBJECT_MT_APPEND(bpy.types.Operator):
     bl_idname = "view3d.thomasriglegacyappend"

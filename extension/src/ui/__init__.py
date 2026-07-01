@@ -36,17 +36,18 @@ class THOMASRIGLEGACY_OT_PANEL(bpy.types.Panel):
         loaded = preferences.mc_textures_loaded
         ignore = preferences.mc_textures_ignore
 
-        # check if textures loaded / skipped
+        # check if textures loaded
         if not loaded and not ignore:
             icon = pcoll["Thomas Rig Legacy"].icon_id
             layout = self.layout
             box = layout.box()
 
-            split = box.split(factor=0.8)
-            split.scale_y = 1.5
+            main = box.split(factor=0.8)
+            main.scale_y = 1.5
+            split = main.split()
             split.alert = True
-            split.operator("thomasriglegacy.mc_textures_import", icon_value = icon)
-            split.alert = False
+            split.label(text="Load in Preferences", icon_value = icon)
+            split = main.split()
             split.operator("thomasriglegacy.mc_textures_skip")
 
             # info text
@@ -186,6 +187,6 @@ class THOMASRIGLEGACY_OT_PANEL(bpy.types.Panel):
 
 def register():
     bpy.utils.register_class(THOMASRIGLEGACY_OT_PANEL)
-  
+
 def unregister():
     bpy.utils.unregister_class(THOMASRIGLEGACY_OT_PANEL)
