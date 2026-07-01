@@ -122,7 +122,9 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
     # armor
     if main_props['Assets_Tab'] == 0:
         col = right.column()
-        col.operator("thomasriglegacy.addarmor", text = "Armor", icon = "ADD").parent = True
+        operator = col.operator("thomasriglegacy.addarmor", text = "Armor", icon = "ADD")
+        operator.parent = True
+        operator.parent_possibility = True
         col.operator("thomasriglegacy.parenttool", text = "Parent", icon = "CON_CHILDOF")
         # space
         col.label(text="")

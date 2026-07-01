@@ -25,6 +25,7 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
     # -------------------- GLOBAL --------------------
     loaded: BoolProperty(default=False)  # type: ignore
     parent: BoolProperty(default=False, options={'SKIP_PRESET'})  # type: ignore
+    parent_possibility: BoolProperty(default=False, options={'SKIP_PRESET'}) # type: ignore # force parent / standalone
     filepath_1: bpy.props.StringProperty(subtype="FILE_PATH", update=filepath_refresh, options={'SKIP_PRESET'})  # type: ignore
     filepath_2: bpy.props.StringProperty(subtype="FILE_PATH", update=filepath_refresh, options={'SKIP_PRESET'})  # type: ignore
 
@@ -135,6 +136,11 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
         
         # If preset selected: not loaded can be cicumvented
         self.reapply_lock()
+
+        # set parent option again based on called operator
+        # could be circumvented by presets
+        # retain backwards compatibility for older presets
+        self.parent = self.parent_possibility
 
         try:
             mode = context.object.mode

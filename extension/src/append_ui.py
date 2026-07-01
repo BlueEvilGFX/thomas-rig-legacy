@@ -15,6 +15,7 @@ def menu_func(self, context):
     layout.operator("view3d.thomasriglegacyappend", icon_value = custom_icon)
     armor_op = layout.operator("thomasriglegacy.addarmor", text = "Add Minecraft Armor", icon = "MATCLOTH")
     armor_op.parent = False
+    armor_op.parent_possibility = False
     # armor_op.helmet = True
     # armor_op.chestplate = True
     # armor_op.leggings = True
