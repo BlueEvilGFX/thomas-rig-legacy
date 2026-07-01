@@ -15,74 +15,78 @@ class AddonPreferences(bpy.types.AddonPreferences):
     previous_version : IntVectorProperty(default=(0, 0, 0), size=3) #type: ignore
 
     # -------------------- SETTINGS --------------------
-    second_layer_alternative_placement : BoolProperty(default=False) #type: ignore
-    show_pose_mode: BoolProperty(default=True) #type: ignore
+    second_layer_alternative_placement : BoolProperty(
+        default=False,
+        description="If turned on, the head will spawn above the head and not on the head."
+    ) #type: ignore
+
+    show_pose_mode: BoolProperty(
+        default=True,
+        description="If active the rest pose toggle will be displayed in the rig UI."
+    ) #type: ignore
+
     default_player_rig_scale: BoolProperty(default=False) #type: ignore
-    verbose : BoolProperty(default=False) #type: ignore
+
+    verbose: BoolProperty(
+        default=False,
+        description="Printing debugging information to the terminal for operators."
+    ) #type: ignore
+
+    loaded_version: StringProperty() # type: ignore
+
 
     def draw(self, context):
         pcoll = icons.thomas_icons["thomas_legacy"]
         layout = self.layout
 
-        settings_col = layout.box().column()
-        settings_col.prop(
-            self,
-            "second_layer_alternative_placement",
-            text="If activated, the 2nd layer head will spawn on the head, not above."
-        )
-        settings_col.prop(
-            self,
-            "show_pose_mode",
-            text="toggle Pose / Rest Pose setting in the UI"
+        # box for general settings
+        box = layout.box()
+        box.label(text="Rig & Extension Settings")
+        col = box.column()
+        col.prop(
+            self, "second_layer_alternative_placement",
+            text = "2nd Layer Head Offset",
+            toggle=-1
         )
 
-        row = settings_col.row(align=True)
-        split = row.split(factor=0.5)
-        left = split.row(align=True)
+        col.prop(
+            self, "show_pose_mode",
+            text="Toggle rest pose setting in UI"
+        )
         
-        left.prop(
-            self,
-            "default_player_rig_scale",
-            text="Minecraft Scale",
-            toggle = True
-        )
-        left.prop(
-            self,
-            "default_player_rig_scale",
-            text="Original Scale",
-            toggle = True,
-            invert_checkbox=True
-        )
-        right = split
-        right.label(text="Toggles the default player rig scale")
+        row_scale = box.row(align=True)
+        scale_toggles = row_scale.row(align=True)
+        scale_toggles.prop(self, "default_player_rig_scale", text="Minecraft Scale", toggle=True)
+        scale_toggles.prop(self, "default_player_rig_scale", text="Original Scale", toggle=True, invert_checkbox=True)
+        scale_toggles.label(text="Player Rig Scale", icon="BLANK1")
 
-        settings_col.prop(
-            self,
-            "verbose",
-            text="toggle verbose settings for operators"
+        col.prop(
+            self, "verbose",
+            text="Verbose Operator Settings"
         )
 
-        col = layout.box().column()
-        if not self.mc_textures_loaded:
-            row = col.row()
-            row.label(text="Textures not loaded", icon = "CANCEL")
-            row.label(text="Using fallback textures", icon = "ERROR")
-        
-        alert = (self.mc_textures_loaded == False)
 
-        icon = pcoll["Thomas Rig Legacy"].icon_id
-        if alert:
-            row = col.row()
-            row.alert = True
+        # box for texture loading
+        box = layout.box()
+        box.label(text="Texture Management")
+        col = box.column()
+
+        box.operator
+
+        # import operator with progress bar
+        row = col.row()
+        progress = context.scene.thomas_rig_legacy.progress_bar
+        if progress == 0:
             row.operator("thomasriglegacy.mc_textures_import_manually", text = "import textures", icon = "IMPORT")
-        
         else:
-            row = col.row()
-            progress = context.scene.thomas_rig_legacy.progress_bar
-            if progress == 0:
-                row.operator("thomasriglegacy.mc_textures_import_manually", text = "import textures", icon = "IMPORT")
-            else:
-                row.progress( text="Loading Files", factor=progress, type='BAR')
+            row.progress( text="Loading Files", factor=progress, type='BAR')
+
+        if self.mc_textures_loaded:
+            col.label(text=f"Active Textures: Minecraft {self.loaded_version}", icon="CHECKBOX_HLT")
+        else:
+            col.label(text="No Active Textures", icon="PANEL_CLOSE")
+
+        col.separator()
 
         # info text
         # Get the 3D View area
@@ -102,7 +106,8 @@ class AddonPreferences(bpy.types.AddonPreferences):
         # Split the text into lines and format each line
         row = col.row()
         for text in [INFO_TEXT_PREFERENCES, INFO_TEXT_PREFERENCES_IMPORT]:
-            col = row.column()
+            box = row.box()
+            col = box.column()
             for line in text.splitlines():
                 # Remove leading and trailing whitespace
                 line = line.strip()

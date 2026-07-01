@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 import platform
+import json
 
 from bpy_extras.io_utils import ImportHelper
 
@@ -40,6 +41,8 @@ class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
         default = "*.zip;*.rar;*.jar",
         options = {"HIDDEN"}
         ) # type: ignore
+    
+    loaded_version: bpy.props.IntVectorProperty() # type: ignore
 
     def execute(self, context):
         filepath = self.filepath
@@ -51,7 +54,7 @@ class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
         preferences = context.preferences.addons[constants.PACKAGE].preferences
 
         texture_path = bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures", create=True)
-        extraction_map, extracted_textures = extract_from_zip(texture_path, filepath)
+        extraction_map, extracted_textures, version = extract_from_zip(texture_path, filepath)
 
         if not verify_extraction_complete(extraction_map, extracted_textures):
             self.error = Errors.NOT_ALL_TEXTURES
@@ -61,12 +64,12 @@ class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
                 
         # set addon preferences texture loaded property
         preferences.mc_textures_loaded = True
+        preferences.loaded_version = version
         bpy.ops.wm.save_userpref()
 
-        # reload icons
+        # reload iconsz
         icons.unregister()
         icons.register()
-        version = os.path.splitext(os.path.basename(filepath))[0]
         icons.IconReader.reload_icons()
         self.report({"INFO"}, version + " MC textures loaded successfully")
         return{'FINISHED'}
@@ -94,8 +97,25 @@ def extract_from_zip(texture_path, jar_path):
     }
 
     extracted_textures = {}
+    version = "None"
 
     with zipfile.ZipFile(jar_path, 'r') as archive:
+        verbose = bpy.context.preferences.addons[constants.PACKAGE].preferences.verbose
+
+
+        # read version identifier
+        if "version.json" in archive.namelist():
+            try:
+                with archive.open("version.json") as json_file:
+                    json_data = json.loads(json_file.read().decode("utf-8"))
+                    version = json_data.get("id", "-1.-1.-1")
+
+            except Exception as e:
+                if verbose:
+                    print(f"Error reading version.json when importing textures. {e}")
+
+
+        # extract textures
         for jar_file in archive.namelist():
             # Only look at PNGs
             if not jar_file.endswith(".png"):
@@ -132,7 +152,7 @@ def extract_from_zip(texture_path, jar_path):
                     extracted_textures.setdefault(source_prefix, []).append(target_name)
                     break
 
-    return extraction_map, extracted_textures
+    return extraction_map, extracted_textures, version
 
 def verify_extraction_complete(extraction_map, extracted_textures) -> bool:
     """
