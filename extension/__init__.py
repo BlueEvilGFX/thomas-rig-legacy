@@ -4,7 +4,7 @@ from .src import preferences, icons, properties, operators, append_ui, ui
 # Users must approve them first to be displayed.
 # Using hashes to detect change in file etc.
 # -> script hashes of user ui scripts
-APPROVED_SCRIPTS = set()
+# APPROVED_SCRIPTS = set()
 
 def register():
     preferences.register()
