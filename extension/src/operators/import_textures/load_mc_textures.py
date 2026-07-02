@@ -1,11 +1,6 @@
 import os
-import re
 import zipfile
 import bpy
-from dataclasses import dataclass
-from enum import Enum
-from pathlib import Path
-import platform
 import json
 
 from bpy_extras.io_utils import ImportHelper

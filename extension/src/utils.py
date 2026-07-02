@@ -1,6 +1,5 @@
 import bpy
 import addon_utils
-import hashlib
 
 from . import constants
 
@@ -144,6 +143,3 @@ def get_image_size(filepath: str) -> Optional[Tuple[int, int]]:
 
         return [xres, yres]
     return None
-
-def hash_string(text: str) -> str:
-    return hashlib.sha256(text.encode('utf-8')).hexdigest()

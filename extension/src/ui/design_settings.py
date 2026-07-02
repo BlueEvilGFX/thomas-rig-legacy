@@ -257,40 +257,4 @@ def draw_user_props(context, rig, layout, misc_props, user_props):
         source = misc_props['UI_Script']
         source_string = source.as_string()
 
-        # check which system to use
-        system = source.lines[0].body
-    
-        if "PYTHON" in system: # Python
-            # trusted check
-            # if hash is present, the user trusted the script
-            # -> execute script
-            from ... import APPROVED_SCRIPTS
-            hash = utils.hash_string(source_string)
-
-            if hash in APPROVED_SCRIPTS:
-                # defining namespace to restrict access
-                namespace = {
-                    "layout" : layout,
-                    "box": box,
-                    "context" : context,
-                    "rig" : rig,
-                    "user_props" : user_props,
-                }
-                exec(source_string, namespace)
-                
-            # Untrusted source -> ask for permission
-            else:
-                row = box.row()
-                row.label(text="This rig contains a Python UI script.", icon="ERROR")
-                column = box.column(align=True)
-                column.label(text="Enable only if you trust the author", icon="ERROR")
-                column.label(icon="BLANK1", text="or reviewed the script.")
-
-                row = box.row()
-                row.alert = True
-                row.operator("thomasriglegacy.approve_script", text="Allow Execution")
-
-        # elif "DSL"in system: # Domain Specific Language
-            # node = eval(source_string)
-
-            # render(node, box, context)
+        # code for TOML display
