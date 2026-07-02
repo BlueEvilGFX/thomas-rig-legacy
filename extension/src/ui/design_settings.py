@@ -1,5 +1,6 @@
 from .. import utils
 from .. import constants
+from . import toml_ui
 
 def draw(main_props, misc_props, user_props, layout, context, rig):
     from .. import icons
@@ -14,8 +15,6 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
     row = box.row(align=True)
     row.prop(rig.pose.bones["Root"].constraints["pre-scale"], "enabled", text="MC Scale", emboss=True, icon="CHECKBOX_DEHLT")
     row.prop(rig.pose.bones["Root"].constraints["pre-scale"], "enabled", text="Original Scale", invert_checkbox=True, icon="CHECKBOX_DEHLT")
- 
-
 
     box = layout.box()
     col = box.column()
@@ -258,3 +257,4 @@ def draw_user_props(context, rig, layout, misc_props, user_props):
         source_string = source.as_string()
 
         # code for TOML display
+        toml_ui.draw_toml(context, rig, box, source_string)
