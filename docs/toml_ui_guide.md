@@ -92,4 +92,5 @@ align = false
 factor = 0.6
 children = [
     { type = "prop", data = "context", property = "render.resolution_x", text="vec3 bool"}
-]```
+]
+```
