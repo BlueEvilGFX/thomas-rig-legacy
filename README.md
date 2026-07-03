@@ -42,7 +42,7 @@ Download now and start animating!
 - The rig should only be moved in pose mode.
 
 > [!TIP]
-> The short [Thomas Rig Legacy Wiki](https://github.com/BlueEvilGFX/thomas-rig-legacy/wiki/) will help you using advanced elements of the rig.
+> The short [Thomas Rig Legacy Wiki](https://github.com/BlueEvilGFX/thomas-rig-legacy/wiki/) will help you using the advanced elements of the rig.
 
 <br>
 
