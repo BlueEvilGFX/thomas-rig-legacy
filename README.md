@@ -41,7 +41,7 @@ Download now and start animating!
 - *To use the original Minecraft textures, you must have a legal copy of Minecraft installed on your device (min. ver. 1.21.11). While fallback textures are available, they do not cover all textures.*
 - The rig should only be moved in pose mode.
 
-> [!INFO]
+> [!TIP]
 > A short wiki will help you using advanced elements of the rig.
 
 <br>
