@@ -11,9 +11,11 @@ from .skin_download import THOMAS_RIG_SKIN_DOWNLOAD
 from .tool_parent import THOMAS_RIG_TOOL_PARENT
 from .rig_update import THOMAS_RIG_UPDATE_RIG
 from .append_base_mesh import THOMAS_RIG_LEGACY_APPEND_BASE_MESH
+from .clear_imported_textures import THOMAS_RIG_CLEAR_IMPORTED_TEXTURES
 
 
 classes = (
+    THOMAS_RIG_CLEAR_IMPORTED_TEXTURES,
     MC_TEXTURES_SKIP_OT_SET,
     MC_TEXTURES_IMPORT_OT_SET,
     THOMAS_RIG_SKIN_DOWNLOAD,

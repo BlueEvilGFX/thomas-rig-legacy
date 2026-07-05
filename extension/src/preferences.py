@@ -65,7 +65,7 @@ class AddonPreferences(bpy.types.AddonPreferences):
             text="Verbose Operator Settings"
         )
 
-
+        # -----------------------
         # box for texture loading
         box = layout.box()
         box.label(text="Texture Management")
@@ -74,12 +74,16 @@ class AddonPreferences(bpy.types.AddonPreferences):
         box.operator
 
         # import operator with progress bar
-        row = col.row()
+        row = col.row(align=True)
         progress = context.scene.thomas_rig_legacy.progress_bar
         if progress == 0:
             row.operator("thomasriglegacy.mc_textures_import_manually", text = "import textures", icon = "IMPORT")
         else:
             row.progress( text="Loading Files", factor=progress, type='BAR')
+
+        split = row.row(align=True)
+        split.enabled = self.mc_textures_loaded
+        split.operator("thomasriglegacy.clearimportedtextures", text="", icon="TRASH")
 
         if self.mc_textures_loaded:
             col.label(text=f"Active Textures: Minecraft {self.loaded_version}", icon="CHECKBOX_HLT")
