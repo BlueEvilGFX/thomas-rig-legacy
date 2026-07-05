@@ -27,6 +27,7 @@ class OBJECT_MT_APPEND(bpy.types.Operator):
     bl_label = "Thomas Rig Legacy"
 
     def execute(self, context):
+        existing_collections = set(bpy.data.collections.keys())
         preferences = context.preferences.addons[constants.PACKAGE].preferences 
 
         blendfile = os.path.join(constants.RIGS_PATH, "Thomas Rig Legacy.blend")
@@ -59,7 +60,44 @@ class OBJECT_MT_APPEND(bpy.types.Operator):
         # set default size
         default_size = preferences.default_player_rig_scale # False: Minecraft, True: Original -> show constraint
         rig.pose.bones["Root"].constraints["pre-scale"].enabled = default_size
-        return{'FINISHED'}
+
+        # rename appended collection
+        # delete top level appended collection
+        new_collections = [col for col in bpy.data.collections.keys() if col not in existing_collections]
+        
+        if new_collections:
+            active_col = context.collection
+            new_cols = [bpy.data.collections.get(name) for name in new_collections if bpy.data.collections.get(name)]
+            
+            root_to_remove = None
+            
+            # find true top level collection, rename and safe
+            for collection in new_cols:
+                if collection.name.startswith("Rig [only append this]"):
+                    collection.name = "Thomas Rig Legacy"
+                    
+                    # link collection
+                    if collection.name not in active_col.children.keys():
+                        try:
+                            active_col.children.link(collection)
+                        except Exception:
+                            pass # if already on first layer
+                            
+                # unwanted embracing appended collection
+                elif collection.name.startswith("Appended"):
+                    root_to_remove = collection
+
+            if root_to_remove:
+                # save content
+                for obj in root_to_remove.objects:
+                    if obj.name not in active_col.objects.keys():
+                        active_col.objects.link(obj)
+                
+                # delete collection enclosure
+                bpy.data.collections.remove(root_to_remove)
+
+        return {'FINISHED'}
+
 
 
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
