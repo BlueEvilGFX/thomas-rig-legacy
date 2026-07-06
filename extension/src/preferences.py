@@ -2,7 +2,6 @@ import bpy
 from bpy.props import BoolProperty, IntVectorProperty, StringProperty
 import textwrap
 
-from . import icons
 from .constants import INFO_TEXT_PREFERENCES,INFO_TEXT_PREFERENCES_IMPORT, PACKAGE
 from . import utils
 
@@ -36,7 +35,6 @@ class AddonPreferences(bpy.types.AddonPreferences):
 
 
     def draw(self, context):
-        pcoll = icons.thomas_icons["thomas_legacy"]
         layout = self.layout
 
         # box for general settings

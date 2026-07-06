@@ -1,20 +1,24 @@
 import bpy
 import os
 
-from . import icons
+from .icons import Icons
 from . import constants
 from . import utils
 
 def menu_func(self, context):
     layout = self.layout
-    pcoll = icons.thomas_icons["thomas_legacy"]
-    custom_icon = pcoll["Thomas Rig Legacy"].icon_id
+    custom_icon = Icons.Thomas_Rig_Legacy
 
     preferences = utils.get_extension_preferences()
     loaded = preferences.mc_textures_loaded
 
     layout.operator("view3d.thomasriglegacyappend", icon_value = custom_icon)
-    armor_op = layout.operator("thomasriglegacy.addarmor", text = "Add Minecraft Armor", icon = "MATCLOTH")
+    armor_op = layout.operator(
+        "thomasriglegacy.addarmor",
+        text = "Add Minecraft Armor",
+        icon = "MATCLOTH" if not Icons.iron_chestplate else 'NONE',
+        icon_value = Icons.iron_chestplate
+    )
     armor_op.parent = False
     armor_op.parent_possibility = False
     # armor_op.helmet = True

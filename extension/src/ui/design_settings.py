@@ -3,7 +3,7 @@ from .. import constants
 from . import toml_ui
 
 def draw(main_props, misc_props, user_props, layout, context, rig):
-    from .. import icons
+    from ..icons import Icons
 
     # Pose / Rest Pose
     box = layout.box().column()
@@ -89,23 +89,23 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
     left = split.box().column()
     right = split.box().column()
 
-    pcoll = icons.thomas_icons["thomas_legacy"]
+    pcoll = Icons.Thomas_Rig_Legacy
     sub_tab = rig.pose.bones["Main_Properties"]["Assets_Tab"]
 
     # check for minecraft original icons
-    if pcoll.get("elytra") is None:
+    if not Icons.elytra:
         sub_tabs = {
             0 : "MOD_CLOTH",
-            1 : pcoll["cape"].icon_id,
+            1 : Icons.cape,
             2 : "MOD_MIRROR",
             3 : "ADD"
         }
     else:
         sub_tabs = {
-            0 : pcoll["iron_chestplate"].icon_id,
-            1 : pcoll["cape"].icon_id,
-            2 : pcoll["elytra"].icon_id,
-            3 : pcoll["glow_item_frame"].icon_id
+            0 : Icons.iron_chestplate,
+            1 : Icons.cape,
+            2 : Icons.elytra,
+            3 : Icons.glow_item_frame
         }
 
     for i in range(4):

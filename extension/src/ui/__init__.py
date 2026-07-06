@@ -30,15 +30,14 @@ class THOMASRIGLEGACY_OT_PANEL(bpy.types.Panel):
         return True
 
     def draw(self, context):
-        from .. import icons
-        pcoll = icons.thomas_icons["thomas_legacy"]
+        from ..icons import Icons
         preferences = context.preferences.addons[PACKAGE].preferences 
         loaded = preferences.mc_textures_loaded
         ignore = preferences.mc_textures_ignore
 
         # check if textures loaded
         if not loaded and not ignore:
-            icon = pcoll["Thomas Rig Legacy"].icon_id
+            icon = Icons.Thomas_Rig_Legacy
             layout = self.layout
             box = layout.box()
 
@@ -78,7 +77,7 @@ class THOMASRIGLEGACY_OT_PANEL(bpy.types.Panel):
             return
         
         # normal UI
-        icon = pcoll["automatic"].icon_id
+        icon = Icons.automatic
         row = self.layout.row(align=True)
         row.prop(context.scene.thomas_rig_legacy, 'reference', text = "")
         row.prop(context.scene.thomas_rig_legacy, 'reference_toggle', toggle=True, text="", icon_value = icon)

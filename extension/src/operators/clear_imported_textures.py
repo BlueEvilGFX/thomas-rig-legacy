@@ -15,7 +15,7 @@ class THOMAS_RIG_CLEAR_IMPORTED_TEXTURES(bpy.types.Operator):
         )
         shutil.rmtree(path)
 
-        from . import utils
+        from .. import utils
         preferences = utils.get_extension_preferences()
 
         preferences.mc_textures_ignore = True
@@ -24,6 +24,7 @@ class THOMAS_RIG_CLEAR_IMPORTED_TEXTURES(bpy.types.Operator):
 
         IconReader.reload_icons()
         
+        self.report({"INFO"}, "Textures cleared successfully")
         return {'FINISHED'}
     
     def invoke(self, context, event):

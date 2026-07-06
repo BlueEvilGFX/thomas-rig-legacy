@@ -3,10 +3,9 @@ from ... import constants
 from .logic.armor_enums import TrimEnum, MaterialEnum, ArmorPartEnum, ArmorTypeEnum
 
 def draw_armor_ui(op, context):
-    from ... import icons
+    from ...icons import Icons
 
     # -------------------- ICONS ---------------------
-    pcoll = icons.thomas_icons["thomas_legacy"]
     loaded = getattr(
         get_extension_preferences(),
         "mc_textures_loaded",
@@ -14,10 +13,10 @@ def draw_armor_ui(op, context):
     )
 
     icon_dict = {
-        ArmorPartEnum.HELMET : pcoll["helmet_iron"].icon_id,
-        ArmorPartEnum.CHESTPLATE : pcoll["chestplate_iron"].icon_id,
-        ArmorPartEnum.LEGGINGS : pcoll["leggings_iron"].icon_id,
-        ArmorPartEnum.BOOTS : pcoll["boots_iron"].icon_id,
+        ArmorPartEnum.HELMET : Icons.helmet_iron,
+        ArmorPartEnum.CHESTPLATE : Icons.chestplate_iron,
+        ArmorPartEnum.LEGGINGS : Icons.leggings_iron,
+        ArmorPartEnum.BOOTS : Icons.boots_iron,
     }
 
     # -------------------- UI ------------------------
@@ -31,7 +30,7 @@ def draw_armor_ui(op, context):
     # DEFAULT ARMOR UI
     # -------------------------------------------------------------------------
     if op.armor_type == ArmorTypeEnum.DEFAULT.value:
-        _draw_default(op, column, icon_dict, pcoll)
+        _draw_default(op, column, icon_dict, Icons)
 
     # -------------------------------------------------------------------------
     # CUSTOM ARMOR UI
@@ -82,7 +81,7 @@ def draw_armor_ui(op, context):
             op, 
             column, 
             icon_dict, 
-            pcoll, 
+            Icons, 
             False, 
             bool(correct_size_1 and bool(size_1)),
             bool(correct_size_2 and bool(size_2))
@@ -103,7 +102,7 @@ def draw_armor_ui(op, context):
             box.label(text="Wrong format or texture size.", icon="WARNING_LARGE")
 
 
-def _draw_default(op, column, icon_dict, pcoll, is_default=True, layer_1=True, layer_2=True):
+def _draw_default(op, column, icon_dict, Icons, is_default=True, layer_1=True, layer_2=True):
     UI_Utils.spacer(column, 0.3)
 
     # Naming text info
@@ -186,13 +185,12 @@ def _draw_default(op, column, icon_dict, pcoll, is_default=True, layer_1=True, l
         # Enchantment
         enchantment_row = row.split().row()
         enchantment_row.enabled = op.loaded
-        enchanted_book = pcoll.get("enchanted_book", False)
-        icon_value = enchanted_book.icon_id if enchanted_book else 0
+        enchanted_book = Icons.enchanted_book
         enchantment_row.prop(
             op,
             f"{element}_enchantment",
-            icon_value = icon_value,
-            icon="EVENT_E" if "enchanted_book" not in pcoll else 'NONE',
-                text="",
-                toggle=True
-            )
+            icon_value = enchanted_book,
+            icon="EVENT_E" if not enchanted_book else 'NONE',
+            text="",
+            toggle=True
+        )
