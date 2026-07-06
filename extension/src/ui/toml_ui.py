@@ -3,6 +3,7 @@ import tomllib
 import bpy
 
 from .. import constants
+from .. import utils
 
 
 class UIType(Enum):
@@ -25,7 +26,7 @@ def draw_toml(context, rig, layout, toml: str) -> dict:
     """
     Parses the toml file and then displays it
     """
-    verbose = bpy.context.preferences.addons[constants.PACKAGE].preferences.verbose
+    verbose = utils.get_extension_preferences().verbose
     try:
         data = tomllib.loads(toml)
     except Exception as e:

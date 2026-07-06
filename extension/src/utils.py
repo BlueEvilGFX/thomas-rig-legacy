@@ -143,3 +143,6 @@ def get_image_size(filepath: str) -> Optional[Tuple[int, int]]:
 
         return [xres, yres]
     return None
+
+def get_extension_preferences():
+    return bpy.context.preferences.addons[constants.PACKAGE].preferences

@@ -15,7 +15,8 @@ class THOMAS_RIG_CLEAR_IMPORTED_TEXTURES(bpy.types.Operator):
         )
         shutil.rmtree(path)
 
-        preferences = context.preferences.addons[constants.PACKAGE].preferences 
+        from . import utils
+        preferences = utils.get_extension_preferences()
 
         preferences.mc_textures_ignore = True
         preferences.mc_textures_loaded = False

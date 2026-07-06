@@ -1,4 +1,4 @@
-from ...utils import UI_Utils, get_image_size
+from ...utils import UI_Utils, get_image_size, get_extension_preferences
 from ... import constants
 from .logic.armor_enums import TrimEnum, MaterialEnum, ArmorPartEnum, ArmorTypeEnum
 
@@ -8,7 +8,7 @@ def draw_armor_ui(op, context):
     # -------------------- ICONS ---------------------
     pcoll = icons.thomas_icons["thomas_legacy"]
     loaded = getattr(
-        context.preferences.addons[constants.PACKAGE].preferences,
+        get_extension_preferences(),
         "mc_textures_loaded",
         False
     )

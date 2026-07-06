@@ -4,6 +4,7 @@ import bpy.utils.previews
 from bpy.app.handlers import persistent
 
 from . import constants
+from . import utils
 
 
 class IconReader:
@@ -20,8 +21,8 @@ class IconReader:
             pcoll.load(os.path.splitext(icon)[0], path, "IMAGE") 
 
         # loaded mc icons
-        preferenes = bpy.context.preferences.addons[constants.PACKAGE].preferences 
-        loaded = preferenes.mc_textures_loaded
+        preferences = utils.get_extension_preferences()
+        loaded = preferences.mc_textures_loaded
         if loaded:
             texture_path = bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures")
             dir = os.path.join(texture_path, "icons")

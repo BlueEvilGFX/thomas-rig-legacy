@@ -4,7 +4,7 @@ import bpy
 import json
 
 from bpy_extras.io_utils import ImportHelper
-
+from ... import utils
 from ... import icons
 from ... import constants
 from ... import constants
@@ -22,7 +22,7 @@ class MC_TEXTURES_SKIP_OT_SET(bpy.types.Operator):
     bl_description = ""
 
     def execute(self, context):
-        preferences = context.preferences.addons[constants.PACKAGE].preferences
+        preferences = utils.get_extension_preferences()
         preferences.mc_textures_ignore = True
         bpy.ops.wm.save_userpref()
         icons.IconReader.reload_icons()
@@ -47,7 +47,7 @@ class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
             self.report({"WARNING"}, Errors.WRONG_FILE_FORMAT.error_text())
             return {'CANCELLED'}
 
-        preferences = context.preferences.addons[constants.PACKAGE].preferences
+        preferences = utils.get_extension_preferences()
 
         texture_path = bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures", create=True)
         extraction_map, extracted_textures, version = extract_from_zip(texture_path, filepath)
@@ -96,7 +96,7 @@ def extract_from_zip(texture_path, jar_path):
     version = "None"
 
     with zipfile.ZipFile(jar_path, 'r') as archive:
-        verbose = bpy.context.preferences.addons[constants.PACKAGE].preferences.verbose
+        verbose = utils.get_extension_preferences().verbose
 
 
         # read version identifier
@@ -156,7 +156,7 @@ def verify_extraction_complete(extraction_map, extracted_textures) -> bool:
     Returns False if even one prefix/file failed to extract.
     """
     all_successful = True
-    verbose = bpy.context.preferences.addons[constants.PACKAGE].preferences.verbose
+    verbose = utils.get_extension_preferences().verbose
 
     if verbose:
         print("Verify File Extraction:")

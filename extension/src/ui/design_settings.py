@@ -8,7 +8,7 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
     # Pose / Rest Pose
     box = layout.box().column()
     row = box.row(align=True)
-    preferences = context.preferences.addons[constants.PACKAGE].preferences 
+    preferences = utils.get_extension_preferences() 
     if preferences.show_pose_mode:
         row.prop(rig.data, "pose_position", expand=True)
     

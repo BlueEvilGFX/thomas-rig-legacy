@@ -112,7 +112,7 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
 
     def invoke(self, context, event):
         # Set mc textures loaded property and default for alternative textures
-        preferences = context.preferences.addons[constants.PACKAGE].preferences
+        preferences = utils.get_extension_preferences()
         self.loaded = preferences.mc_textures_loaded
 
         self.helmet_alt_texture = not self.loaded

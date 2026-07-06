@@ -3,13 +3,14 @@ import os
 
 from . import icons
 from . import constants
+from . import utils
 
 def menu_func(self, context):
     layout = self.layout
     pcoll = icons.thomas_icons["thomas_legacy"]
     custom_icon = pcoll["Thomas Rig Legacy"].icon_id
 
-    preferences = context.preferences.addons[constants.PACKAGE].preferences 
+    preferences = utils.get_extension_preferences()
     loaded = preferences.mc_textures_loaded
 
     layout.operator("view3d.thomasriglegacyappend", icon_value = custom_icon)
@@ -28,7 +29,7 @@ class OBJECT_MT_APPEND(bpy.types.Operator):
 
     def execute(self, context):
         existing_collections = set(bpy.data.collections.keys())
-        preferences = context.preferences.addons[constants.PACKAGE].preferences 
+        preferences = utils.get_extension_preferences()
 
         blendfile = os.path.join(constants.RIGS_PATH, "Thomas Rig Legacy.blend")
         section = "Collection"
