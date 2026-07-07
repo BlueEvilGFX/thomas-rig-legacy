@@ -30,7 +30,7 @@ class MC_TEXTURES_SKIP_OT_SET(bpy.types.Operator):
         
 class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
     bl_idname = "thomasriglegacy.mc_textures_import_manually" 
-    bl_label = "import mc textures"
+    bl_label = "import textures"
     bl_description = "This will load the textures into the extensions storage. It can take a small amount of time to process it."
 
     filter_glob : bpy.props.StringProperty(
@@ -38,7 +38,7 @@ class MC_TEXTURES_IMPORT_OT_SET(bpy.types.Operator, ImportHelper):
         options = {"HIDDEN"}
         ) # type: ignore
     
-    loaded_version: bpy.props.IntVectorProperty() # type: ignore
+    loaded_version: bpy.props.IntVectorProperty(options={'HIDDEN'}) # type: ignore
 
     def execute(self, context):
         filepath = self.filepath
