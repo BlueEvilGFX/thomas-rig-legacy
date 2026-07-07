@@ -1,37 +1,39 @@
 import bpy
 import os
 
-from . import icons
+from .icons import Icons
 from . import constants
+from . import utils
 
 def menu_func(self, context):
     layout = self.layout
-    pcoll = icons.thomas_icons["thomas_legacy"]
-    custom_icon = pcoll["Thomas Rig Legacy"].icon_id
+    custom_icon = Icons.Thomas_Rig_Legacy
 
-    preferences = context.preferences.addons[constants.PACKAGE].preferences 
+    preferences = utils.get_extension_preferences()
     loaded = preferences.mc_textures_loaded
-    ignore = preferences.mc_textures_ignore
-    if loaded or ignore:
-        layout.operator("view3d.thomasriglegacyappend", icon_value = custom_icon)
-        armor_op = layout.operator("thomasriglegacy.addarmor", text = "Add Minecraft Armor", icon = "MATCLOTH")
-        armor_op.parent = False
-        # armor_op.helmet = True
-        # armor_op.chestplate = True
-        # armor_op.leggings = True
-        # armor_op.boots = True
-        armor_op.loaded = loaded
 
-    else:
-        layout.alert = True
-        layout.operator("thomasriglegacy.mc_textures_import", icon_value = custom_icon)
+    layout.operator("view3d.thomasriglegacyappend", icon_value = custom_icon)
+    armor_op = layout.operator(
+        "thomasriglegacy.addarmor",
+        text = "Add Minecraft Armor",
+        icon = "MATCLOTH" if not Icons.iron_chestplate else 'NONE',
+        icon_value = Icons.iron_chestplate
+    )
+    armor_op.parent = False
+    armor_op.parent_possibility = False
+    # armor_op.helmet = True
+    # armor_op.chestplate = True
+    # armor_op.leggings = True
+    # armor_op.boots = True
+    armor_op.loaded = loaded
 
 class OBJECT_MT_APPEND(bpy.types.Operator):
     bl_idname = "view3d.thomasriglegacyappend"
     bl_label = "Thomas Rig Legacy"
 
     def execute(self, context):
-        preferences = context.preferences.addons[constants.PACKAGE].preferences 
+        existing_collections = set(bpy.data.collections.keys())
+        preferences = utils.get_extension_preferences()
 
         blendfile = os.path.join(constants.RIGS_PATH, "Thomas Rig Legacy.blend")
         section = "Collection"
@@ -63,7 +65,44 @@ class OBJECT_MT_APPEND(bpy.types.Operator):
         # set default size
         default_size = preferences.default_player_rig_scale # False: Minecraft, True: Original -> show constraint
         rig.pose.bones["Root"].constraints["pre-scale"].enabled = default_size
-        return{'FINISHED'}
+
+        # rename appended collection
+        # delete top level appended collection
+        new_collections = [col for col in bpy.data.collections.keys() if col not in existing_collections]
+        
+        if new_collections:
+            active_col = context.collection
+            new_cols = [bpy.data.collections.get(name) for name in new_collections if bpy.data.collections.get(name)]
+            
+            root_to_remove = None
+            
+            # find true top level collection, rename and safe
+            for collection in new_cols:
+                if collection.name.startswith("Rig [only append this]"):
+                    collection.name = "Thomas Rig Legacy"
+                    
+                    # link collection
+                    if collection.name not in active_col.children.keys():
+                        try:
+                            active_col.children.link(collection)
+                        except Exception:
+                            pass # if already on first layer
+                            
+                # unwanted embracing appended collection
+                elif collection.name.startswith("Appended"):
+                    root_to_remove = collection
+
+            if root_to_remove:
+                # save content
+                for obj in root_to_remove.objects:
+                    if obj.name not in active_col.objects.keys():
+                        active_col.objects.link(obj)
+                
+                # delete collection enclosure
+                bpy.data.collections.remove(root_to_remove)
+
+        return {'FINISHED'}
+
 
 
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

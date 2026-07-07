@@ -1,23 +1,22 @@
-from ...utils import UI_Utils, get_image_size
+from ...utils import UI_Utils, get_image_size, get_extension_preferences
 from ... import constants
 from .logic.armor_enums import TrimEnum, MaterialEnum, ArmorPartEnum, ArmorTypeEnum
 
 def draw_armor_ui(op, context):
-    from ... import icons
+    from ...icons import Icons
 
     # -------------------- ICONS ---------------------
-    pcoll = icons.thomas_icons["thomas_legacy"]
     loaded = getattr(
-        context.preferences.addons[constants.PACKAGE].preferences,
+        get_extension_preferences(),
         "mc_textures_loaded",
         False
     )
 
     icon_dict = {
-        ArmorPartEnum.HELMET : pcoll["helmet_iron"].icon_id,
-        ArmorPartEnum.CHESTPLATE : pcoll["chestplate_iron"].icon_id,
-        ArmorPartEnum.LEGGINGS : pcoll["leggings_iron"].icon_id,
-        ArmorPartEnum.BOOTS : pcoll["boots_iron"].icon_id,
+        ArmorPartEnum.HELMET : Icons.helmet_iron,
+        ArmorPartEnum.CHESTPLATE : Icons.chestplate_iron,
+        ArmorPartEnum.LEGGINGS : Icons.leggings_iron,
+        ArmorPartEnum.BOOTS : Icons.boots_iron,
     }
 
     # -------------------- UI ------------------------
@@ -31,7 +30,7 @@ def draw_armor_ui(op, context):
     # DEFAULT ARMOR UI
     # -------------------------------------------------------------------------
     if op.armor_type == ArmorTypeEnum.DEFAULT.value:
-        _draw_default(op, column, icon_dict, pcoll)
+        _draw_default(op, column, icon_dict, Icons)
 
     # -------------------------------------------------------------------------
     # CUSTOM ARMOR UI
@@ -62,30 +61,40 @@ def draw_armor_ui(op, context):
         size_1 = get_image_size(op.filepath_1)
         size_2 = get_image_size(op.filepath_2)
 
-        correct_size_1 = size_1 == (64, 32) if size_1 else True
-        correct_size_2 = size_2 == (64, 32) if size_2 else True
+        # correct size if x = 2y, default (64, 32)
+        correct_size_1 = size_1 and size_1[0] == 2*size_1[1]
+        correct_size_2 = size_2 and size_2[0] == 2*size_2[1]
+
         file_ending_1 = op.filepath_1.split('.')[-1]
         file_ending_2 = op.filepath_2.split('.')[-1]
 
         row = column.row()
-        row.alert = not correct_size_1
+        row.alert = not correct_size_1 and bool(size_1)
         row.prop(op, "filepath_1")
 
         row = column.row()
-        row.alert = not correct_size_2
+        row.alert = not correct_size_2 and bool(size_2)
         row.prop(op, "filepath_2")
 
-        layer_1 = size_1 is not None
-        layer_2 = size_2 is not None
-
         # -------------------- SETTINGS -----------------------
-        _draw_default(op, column, icon_dict, pcoll, False, layer_1, layer_2)
+        _draw_default(
+            op, 
+            column, 
+            icon_dict, 
+            Icons, 
+            False, 
+            bool(correct_size_1 and bool(size_1)),
+            bool(correct_size_2 and bool(size_2))
+        )
         
         # -------------------- WARNING ------------------------
         wrong_format = (file_ending_1.lower() != "png" and file_ending_1 != "") \
                     or (file_ending_2.lower() != "png" and file_ending_2 != "")
 
-        if not correct_size_1 or not correct_size_2 or wrong_format:
+        if (size_1 is not None and not correct_size_1)\
+                or (size_2 is not None and not correct_size_2)\
+                or wrong_format:
+
             UI_Utils.spacer(op.layout, 0.3)
             box = op.layout.box()
             box.alignment = "CENTER"
@@ -93,7 +102,7 @@ def draw_armor_ui(op, context):
             box.label(text="Wrong format or texture size.", icon="WARNING_LARGE")
 
 
-def _draw_default(op, column, icon_dict, pcoll, is_default=True, layer_1=True, layer_2=True):
+def _draw_default(op, column, icon_dict, Icons, is_default=True, layer_1=True, layer_2=True):
     UI_Utils.spacer(column, 0.3)
 
     # Naming text info
@@ -176,13 +185,12 @@ def _draw_default(op, column, icon_dict, pcoll, is_default=True, layer_1=True, l
         # Enchantment
         enchantment_row = row.split().row()
         enchantment_row.enabled = op.loaded
-        enchanted_book = pcoll.get("enchanted_book", False)
-        icon_value = enchanted_book.icon_id if enchanted_book else 0
+        enchanted_book = Icons.enchanted_book
         enchantment_row.prop(
             op,
             f"{element}_enchantment",
-            icon_value = icon_value,
-            icon="EVENT_E" if "enchanted_book" not in pcoll else 'NONE',
-                text="",
-                toggle=True
-            )
+            icon_value = enchanted_book,
+            icon="EVENT_E" if not enchanted_book else 'NONE',
+            text="",
+            toggle=True
+        )

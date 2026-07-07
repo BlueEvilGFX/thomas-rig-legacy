@@ -11,13 +11,13 @@ from .skin_download import THOMAS_RIG_SKIN_DOWNLOAD
 from .tool_parent import THOMAS_RIG_TOOL_PARENT
 from .rig_update import THOMAS_RIG_UPDATE_RIG
 from .append_base_mesh import THOMAS_RIG_LEGACY_APPEND_BASE_MESH
-from .approve_script import THOMAS_RIG_ASSETS_APPROVE_SCRIPT_OT_SET
+from .clear_imported_textures import THOMAS_RIG_CLEAR_IMPORTED_TEXTURES
 
 
 classes = (
-    MC_TEXTURES_IMPORT_OT_SET,
+    THOMAS_RIG_CLEAR_IMPORTED_TEXTURES,
     MC_TEXTURES_SKIP_OT_SET,
-    MC_TEXTURES_LOAD_OT_SET,
+    MC_TEXTURES_IMPORT_OT_SET,
     THOMAS_RIG_SKIN_DOWNLOAD,
     THOMAS_RIG_ASSETS_ARMOR_TAB_OT_SET,
     THOMAS_RIG_ARMOR_ADD,
@@ -31,7 +31,6 @@ classes = (
     THOMAS_RIG_IMAGERELOAD,
     THOMAS_RIG_UPDATE_RIG,
     THOMAS_RIG_LEGACY_APPEND_BASE_MESH,
-    THOMAS_RIG_ASSETS_APPROVE_SCRIPT_OT_SET
 )
 
 register, unregister = bpy.utils.register_classes_factory(classes)

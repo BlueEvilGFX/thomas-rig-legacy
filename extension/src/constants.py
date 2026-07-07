@@ -7,8 +7,8 @@ RIG_ID = 'Thomas_Rig_Legacy'
 MIN_VERSION = [1, 21, 11]
 
 # info
-INFO_TEXT = "To use the original Minecraft textures, you need to have a legal copy of Minecraft installed (min. ver. 1.21, no snapshot). If you do not own one, please proceed with the `skip` operator. The addon will use alternative textures in the meantime. You can still load the original textures later in the addon preferences once you have Minecraft installed."
-INFO_TEXT_PREFERENCES = "To use the original Minecraft textures, you need to have a legal copy of Minecraft installed (min. ver. 1.21, no snapshot). If you do not own one, the addon will use alternative textures."
+INFO_TEXT = f"To use the original Minecraft textures, you need to have a legal copy of Minecraft installed (min. ver. {str(MIN_VERSION)}, no snapshot). If you do not own one, please proceed with the `skip` operator. The addon will use alternative textures in the meantime. You can still load the original textures later in the addon preferences once you have Minecraft installed."
+INFO_TEXT_PREFERENCES = f"To use the original Minecraft textures, you need to have a legal copy of Minecraft installed (min. ver. {str(MIN_VERSION)}, no snapshot). If you do not own one, the addon will use alternative textures."
 INFO_TEXT_PREFERENCES_IMPORT = f"To manually import the textures, you need to have either the jar or zip file of the game version that contains the game files. This requires also a min. ver. of {str(MIN_VERSION)}."
 
 # main

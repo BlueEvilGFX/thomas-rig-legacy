@@ -1,21 +1,20 @@
 from .. import utils
 from .. import constants
+from . import toml_ui
 
 def draw(main_props, misc_props, user_props, layout, context, rig):
-    from .. import icons
+    from ..icons import Icons
 
     # Pose / Rest Pose
     box = layout.box().column()
     row = box.row(align=True)
-    preferences = context.preferences.addons[constants.PACKAGE].preferences 
+    preferences = utils.get_extension_preferences() 
     if preferences.show_pose_mode:
         row.prop(rig.data, "pose_position", expand=True)
     
     row = box.row(align=True)
     row.prop(rig.pose.bones["Root"].constraints["pre-scale"], "enabled", text="MC Scale", emboss=True, icon="CHECKBOX_DEHLT")
     row.prop(rig.pose.bones["Root"].constraints["pre-scale"], "enabled", text="Original Scale", invert_checkbox=True, icon="CHECKBOX_DEHLT")
- 
-
 
     box = layout.box()
     col = box.column()
@@ -90,23 +89,23 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
     left = split.box().column()
     right = split.box().column()
 
-    pcoll = icons.thomas_icons["thomas_legacy"]
+    pcoll = Icons.Thomas_Rig_Legacy
     sub_tab = rig.pose.bones["Main_Properties"]["Assets_Tab"]
 
     # check for minecraft original icons
-    if pcoll.get("elytra") is None:
+    if not Icons.elytra:
         sub_tabs = {
             0 : "MOD_CLOTH",
-            1 : pcoll["cape"].icon_id,
+            1 : Icons.cape,
             2 : "MOD_MIRROR",
             3 : "ADD"
         }
     else:
         sub_tabs = {
-            0 : pcoll["iron_chestplate"].icon_id,
-            1 : pcoll["cape"].icon_id,
-            2 : pcoll["elytra"].icon_id,
-            3 : pcoll["glow_item_frame"].icon_id
+            0 : Icons.iron_chestplate,
+            1 : Icons.cape,
+            2 : Icons.elytra,
+            3 : Icons.glow_item_frame
         }
 
     for i in range(4):
@@ -122,7 +121,9 @@ def draw(main_props, misc_props, user_props, layout, context, rig):
     # armor
     if main_props['Assets_Tab'] == 0:
         col = right.column()
-        col.operator("thomasriglegacy.addarmor", text = "Armor", icon = "ADD").parent = True
+        operator = col.operator("thomasriglegacy.addarmor", text = "Armor", icon = "ADD")
+        operator.parent = True
+        operator.parent_possibility = True
         col.operator("thomasriglegacy.parenttool", text = "Parent", icon = "CON_CHILDOF")
         # space
         col.label(text="")
@@ -255,40 +256,5 @@ def draw_user_props(context, rig, layout, misc_props, user_props):
         source = misc_props['UI_Script']
         source_string = source.as_string()
 
-        # check which system to use
-        system = source.lines[0].body
-    
-        if "PYTHON" in system: # Python
-            # trusted check
-            # if hash is present, the user trusted the script
-            # -> execute script
-            from ... import APPROVED_SCRIPTS
-            hash = utils.hash_string(source_string)
-
-            if hash in APPROVED_SCRIPTS:
-                # defining namespace to restrict access
-                namespace = {
-                    "layout" : layout,
-                    "box": box,
-                    "context" : context,
-                    "rig" : rig,
-                    "user_props" : user_props,
-                }
-                exec(source_string, namespace)
-                
-            # Untrusted source -> ask for permission
-            else:
-                row = box.row()
-                row.label(text="This rig contains a Python UI script.", icon="ERROR")
-                column = box.column(align=True)
-                column.label(text="Enable only if you trust the author", icon="ERROR")
-                column.label(icon="BLANK1", text="or reviewed the script.")
-
-                row = box.row()
-                row.alert = True
-                row.operator("thomasriglegacy.approve_script", text="Allow Execution")
-
-        # elif "DSL"in system: # Domain Specific Language
-            # node = eval(source_string)
-
-            # render(node, box, context)
+        # code for TOML display
+        toml_ui.draw_toml(context, rig, box, source_string)

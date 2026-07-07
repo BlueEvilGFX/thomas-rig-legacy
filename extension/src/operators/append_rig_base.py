@@ -1,7 +1,7 @@
 import bpy
 import os
 
-from ..utils import get_rig
+from ..utils import get_rig, get_extension_preferences
 from .. import constants
 
 
@@ -48,7 +48,7 @@ class ThomasRigLegacyAppendRigBase(bpy.types.Operator):
         else: # elytra
             object.modifiers[0].object = thomas_rig
             # load texture IF Mc textures 
-            preferences = context.preferences.addons[constants.PACKAGE].preferences 
+            preferences =  get_extension_preferences()
             if preferences.mc_textures_loaded:
                 res_path = bpy.utils.extension_path_user(package = constants.PACKAGE, path = "textures")
                 material = object.material_slots[0].material

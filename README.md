@@ -41,6 +41,9 @@ Download now and start animating!
 - *To use the original Minecraft textures, you must have a legal copy of Minecraft installed on your device (min. ver. 1.21.11). While fallback textures are available, they do not cover all textures.*
 - The rig should only be moved in pose mode.
 
+> [!TIP]
+> The short [Thomas Rig Legacy Wiki](https://github.com/BlueEvilGFX/thomas-rig-legacy/wiki/) will help you using the advanced elements of the rig.
+
 <br>
 
 [![Join our Discord](https://img.shields.io/badge/Join_our_Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](

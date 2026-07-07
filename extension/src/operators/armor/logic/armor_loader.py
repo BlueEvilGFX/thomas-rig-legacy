@@ -50,7 +50,7 @@ class ArmorLoader:
             active_collection=True
         )
         if not self.parent:
-            return
-        
+            return bpy.context.selected_objects
+
         bpy.ops.object.mode_set(mode = "OBJECT")
         return bpy.context.selected_objects

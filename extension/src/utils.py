@@ -1,73 +1,70 @@
 import bpy
 import addon_utils
-import hashlib
 
 from . import constants
 
 from typing import List, Optional, Tuple
+
 
 def add_modifier_armature(rig, obj) -> bpy.types.Modifier:
     modifier = obj.modifiers.new(name = "Skeleton", type = "ARMATURE")
     modifier.object = rig
     return modifier
 
-def add_modifier_lattice_chest_pose(rig, obj) -> bpy.types.Modifier:
-    lattice = get_mat_object(rig).modifiers["Chest_Pose"].object
-    modifier = obj.modifiers.new(name = "Chest_Pose", type = "LATTICE")
+# main logic for lattice modifier
+def _add_lattice_base(
+        rig, obj,
+        rig_modifier_name: str, 
+        new_modifier_name: str, 
+        vertex_group: str = ""
+    ) -> bpy.types.Modifier:
+
+    lattice = get_mat_object(rig).modifiers[rig_modifier_name].object
+    modifier = obj.modifiers.new(name=new_modifier_name, type="LATTICE")
     modifier.object = lattice
+    if vertex_group:
+        modifier.vertex_group = vertex_group
     return modifier
+
+# sub lattic apply functions
+def add_modifier_lattice_chest_pose(rig, obj) -> bpy.types.Modifier:
+    return _add_lattice_base(rig, obj, "Chest_Pose", "Chest_Pose")
 
 def add_modifier_lattice_arm_pose_R(rig, obj) -> bpy.types.Modifier:
-    lattice = get_mat_object(rig).modifiers["Arm_R"].object
-    modifier = obj.modifiers.new(name = "Arm_R", type = "LATTICE")
-    modifier.object = lattice
-    return modifier
+    return _add_lattice_base(rig, obj, "Arm_R", "Arm_R")
 
 def add_modifier_lattice_arm_pose_L(rig, obj) -> bpy.types.Modifier:
-    lattice = get_mat_object(rig).modifiers["Arm_L"].object
-    modifier = obj.modifiers.new(name = "Arm_L", type = "LATTICE")
-    modifier.object = lattice
-    return modifier
+    return _add_lattice_base(rig, obj, "Arm_L", "Arm_L")
+
 
 def add_modifier_lattice_leg_pose_R(rig, obj) -> bpy.types.Modifier:
-    lattice = get_mat_object(rig).modifiers["Leg_R"].object
-    modifier = obj.modifiers.new(name = "Leg_R", type = "LATTICE")
-    modifier.object = lattice
-    return modifier
+    return _add_lattice_base(rig, obj, "Leg_R", "Leg_R")
 
 def add_modifier_lattice_leg_pose_L(rig, obj) -> bpy.types.Modifier:
-    lattice = get_mat_object(rig).modifiers["Leg_L"].object
-    modifier = obj.modifiers.new(name = "Leg_L", type = "LATTICE")
-    modifier.object = lattice
-    return modifier
+    return _add_lattice_base(rig, obj, "Leg_L", "Leg_L")
 
 def add_modifier_lattice_smart_deform(rig, obj) -> None:
-    lattice = get_mat_object(rig).modifiers["Lattice_Smart_Deform"].object
-    obj.modifiers.new(name = "deform", type = "LATTICE")
-    obj.modifiers["deform"].object = lattice
+    return _add_lattice_base(rig, obj, "Lattice_Smart_Deform", "deform")
 
 def add_modifier_lattice_head(rig, obj) -> None:
-    lattice = get_mat_object(rig).modifiers["Lattice_Head"].object
-    obj.modifiers.new(name = "squash stretch", type = "LATTICE")   
-    obj.modifiers["squash stretch"].object = lattice
-
-def add_modifier_solidify(obj, thickness) -> None:
-    obj.modifiers.new(name = "Solidify", type = "SOLIDIFY")
-    obj.modifiers["Solidify"].thickness = thickness
-    obj.modifiers["Solidify"].use_even_offset = True
-    obj.modifiers["Solidify"].use_quality_normals = True
-
-def add_modifier_subdivision(obj, viewport_level, render_level, sub_type="CATMULL_CLARK") -> None:
-    obj.modifiers.new(name = "subdivision", type = "SUBSURF")
-    obj.modifiers['subdivision'].levels = viewport_level
-    obj.modifiers['subdivision'].render_levels = render_level
-    obj.modifiers['subdivision'].subdivision_type = sub_type
+    return _add_lattice_base(rig, obj, "Lattice_Head", "squash stretch")
 
 def add_modifier_lattice_chest(rig, obj) -> None:
-    lattice = get_mat_object(rig).modifiers["Chest"].object
-    obj.modifiers.new(name = "Chest", type = "LATTICE")
-    obj.modifiers["Chest"].object = lattice
-    obj.modifiers["Chest"].vertex_group = "UpperBodyMain"
+    return _add_lattice_base(rig, obj, "Chest", "Chest")
+
+# ---
+
+def add_modifier_solidify(obj, thickness) -> None:
+    modifier = obj.modifiers.new(name = "Solidify", type = "SOLIDIFY")
+    modifier.thickness = thickness
+    modifier.use_even_offset = True
+    modifier.use_quality_normals = True
+
+def add_modifier_subdivision(obj, viewport_level, render_level, sub_type="CATMULL_CLARK") -> None:
+    modifier = obj.modifiers.new(name = "subdivision", type = "SUBSURF")
+    modifier.levels = viewport_level
+    modifier.render_levels = render_level
+    modifier.subdivision_type = sub_type
 
 def create_item(key):
     return (key, key, "")
@@ -133,15 +130,17 @@ def get_ext_version() -> List[int]:
 
 def get_image_size(filepath: str) -> Optional[Tuple[int, int]]:
     """returns the size of the image (width, height)"""
-    if not filepath:
-        return None
+    import OpenImageIO as oiio
+    
+    inp = oiio.ImageInput.open(filepath)
+    if inp:
+        spec = inp.spec()
+        xres = spec.width
+        yres = spec.height
+        inp.close()
 
-    try:
-        from PIL import Image
-        with Image.open(filepath) as img:
-            return img.size  # (width, height)
-    except Exception:
-        return None
+        return [xres, yres]
+    return None
 
-def hash_string(text: str) -> str:
-    return hashlib.sha256(text.encode('utf-8')).hexdigest()
+def get_extension_preferences():
+    return bpy.context.preferences.addons[constants.PACKAGE].preferences

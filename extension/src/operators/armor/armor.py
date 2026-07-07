@@ -25,6 +25,7 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
     # -------------------- GLOBAL --------------------
     loaded: BoolProperty(default=False)  # type: ignore
     parent: BoolProperty(default=False, options={'SKIP_PRESET'})  # type: ignore
+    parent_possibility: BoolProperty(default=False, options={'SKIP_PRESET'}) # type: ignore # force parent / standalone
     filepath_1: bpy.props.StringProperty(subtype="FILE_PATH", update=filepath_refresh, options={'SKIP_PRESET'})  # type: ignore
     filepath_2: bpy.props.StringProperty(subtype="FILE_PATH", update=filepath_refresh, options={'SKIP_PRESET'})  # type: ignore
 
@@ -111,7 +112,7 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
 
     def invoke(self, context, event):
         # Set mc textures loaded property and default for alternative textures
-        preferences = context.preferences.addons[constants.PACKAGE].preferences
+        preferences = utils.get_extension_preferences()
         self.loaded = preferences.mc_textures_loaded
 
         self.helmet_alt_texture = not self.loaded
@@ -135,6 +136,11 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
         
         # If preset selected: not loaded can be cicumvented
         self.reapply_lock()
+
+        # set parent option again based on called operator
+        # could be circumvented by presets
+        # retain backwards compatibility for older presets
+        self.parent = self.parent_possibility
 
         try:
             mode = context.object.mode
@@ -166,7 +172,12 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
                     continue
 
                 objs = loader.load_custom(armor_part, armor_type)
+
+                if not self.parent:
+                    continue
+
                 modifiers.apply_custom_modifiers(objs, armor_part, armor_type)
+
                 for obj in objs:
                     if armor_type in {'Scuba'}:
                         drivers.apply_default_drivers(obj, armor_part)
@@ -195,8 +206,15 @@ class THOMAS_RIG_ARMOR_ADD(bpy.types.Operator):
 
                 if armor_part in {ArmorPartEnum.HELMET, ArmorPartEnum.CHESTPLATE}:
                     filepath = self.filepath_1
+                    print("FILEPATH", filepath)
+                    if not filepath:
+                        self.helmet = False
+                        self.chestplate = False
                 else:
                     filepath = self.filepath_2
+                    if not filepath:
+                        self.leggings = False
+                        self.boots = False
 
                 self._process_armor_part(
                     armor_part, context, loader, modifiers, drivers, cleanup, node_handler,
