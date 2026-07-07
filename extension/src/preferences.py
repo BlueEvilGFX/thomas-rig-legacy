@@ -73,6 +73,8 @@ class AddonPreferences(bpy.types.AddonPreferences):
 
         # import operator with progress bar
         row = col.row(align=True)
+        row.scale_x = 1.5 
+        row.scale_y = 1.5
         progress = context.scene.thomas_rig_legacy.progress_bar
         if progress == 0:
             row.operator("thomasriglegacy.mc_textures_import_manually", text = "import textures", icon = "IMPORT")
